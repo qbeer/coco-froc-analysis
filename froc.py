@@ -62,18 +62,7 @@ def get_iou_score(gt_box, pr_box):
     return intersection / (gt_area + pr_area - intersection)
 
 
-def run(args):
-    gt = load_json_from_file(args.gt_ann)
-    pr = load_json_from_file(args.pred_ann)
-
-    categories = gt['categories']
-    #assert categories == pr[
-    #    'categories'], 'Categories must match in GT and prediction files!'
-
-    stats = init_statistics(gt, categories)
-
-    id_to_annotation = build_id_to_annotation_dict(gt)
-
+def update_stats(gt, pr, id_to_annotation, stats):
     if type(pr) == dict:
         pr = pr['annotations']
 
@@ -109,6 +98,21 @@ def run(args):
 
         if not is_ll:
             stats[category_id]['NL'] += 1
+
+    return stats
+
+
+def run(args):
+    gt = load_json_from_file(args.gt_ann)
+    pr = load_json_from_file(args.pred_ann)
+
+    categories = gt['categories']
+
+    stats = init_statistics(gt, categories)
+
+    id_to_annotation = build_id_to_annotation_dict(gt)
+
+    stats = update_stats(gt, pr, id_to_annotation, stats)
 
     pprint(stats)
 
