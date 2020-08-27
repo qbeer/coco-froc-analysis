@@ -62,7 +62,7 @@ def get_iou_score(gt_box, pr_box):
     return intersection / (gt_area + pr_area - intersection)
 
 
-def update_stats(gt, pr, id_to_annotation, stats):
+def update_stats(gt, pr, id_to_annotation, stats, args):
     if type(pr) == dict:
         pr = pr['annotations']
 
@@ -112,7 +112,7 @@ def run(args):
 
     id_to_annotation = build_id_to_annotation_dict(gt)
 
-    stats = update_stats(gt, pr, id_to_annotation, stats)
+    stats = update_stats(gt, pr, id_to_annotation, stats, args)
 
     pprint(stats)
 
