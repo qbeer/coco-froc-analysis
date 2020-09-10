@@ -79,7 +79,7 @@ def update_stats(gt, pr, id_to_annotation, stats, args):
             if category_id != gt_ann['category_id']:
                 continue
 
-            if pred_ann['score'] < args.confidence:
+            if pred_ann['score'] < args.score_thres:
                 continue
 
             if args.use_iou:
@@ -135,11 +135,11 @@ if __name__ == "__main__":
         required=False,
         help=
         'If IoU score is used the default threshold is arbitrarily set to .75')
-    parser.add_argument('--confidence',
+    parser.add_argument('--score_thres',
                         default=.5,
                         type=float,
                         required=False,
-                        help='Prediction confidence')
+                        help='Prediction threshold')
 
     args = parser.parse_args()
 

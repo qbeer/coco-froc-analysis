@@ -46,11 +46,11 @@ python froc.py --gt_ann <path_to_ground_truth_annotation_in_COCO_format>\
                --pred_ann <path_to_prediction_annotation_in_COCO_format>\
                --use_iou <flag_parameter_if_used_then_it_is_automatically_set_to_true>\
                --iou_thres <can_be_used_with_the_above_optional_flag>\
-               --confidence <confidence_of_the_predictions_above_which_detections_will_be_considered>
+               --score_thres <score_threshold_default_0.5>
 # arguments are required: --gt_ann, --pred_ann
 ```
 
-By default centroid closeness is used, if the `--use_iou` flag is set, `--iou_thres` defaults to `.75` while the `--confidence` score defaults to `.5`. The code outputs statistics in the dictionary of form:
+By default centroid closeness is used, if the `--use_iou` flag is set, `--iou_thres` defaults to `.75` while the `--score_thres` score defaults to `.5`. The code outputs statistics in the dictionary of form:
 
 ```python
 {
