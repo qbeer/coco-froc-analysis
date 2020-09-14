@@ -130,7 +130,7 @@ def run(args):
 
     stats = update_stats(gt, pr, id_to_annotation, stats, args)
 
-    pprint(stats)
+    return stats
 
 
 if __name__ == "__main__":
