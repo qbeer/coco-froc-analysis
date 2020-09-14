@@ -2,12 +2,26 @@ import argparse
 import json
 from pathlib import Path
 from pprint import pprint
+import numpy as np
 
 
 def load_json_from_file(file_path):
     with Path(file_path).open() as fp:
         data = json.load(fp)
     return data
+
+
+def update_scores(json_data, score_thres):
+    scores = []
+    for pred in json_data:
+        scores.append(pred['score'])
+    scores = np.array(scores)
+    scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))
+    for ind, pred in enumerate(json_data):
+        pred['score'] = scores[ind]
+        if pred['score'] < score_thres:
+            json_data.remove(pred)
+    return json_data
 
 
 def init_statistics(gt, categories):
@@ -105,6 +119,8 @@ def update_stats(gt, pr, id_to_annotation, stats, args):
 def run(args):
     gt = load_json_from_file(args.gt_ann)
     pr = load_json_from_file(args.pred_ann)
+
+    pr = update_scores(pr, args.score_thres)
 
     categories = gt['categories']
 
