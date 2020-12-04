@@ -93,24 +93,24 @@ def update_stats(gt, pr, id_to_annotation, stats, args):
             if category_id != gt_ann['category_id']:
                 continue
 
-            if pred_ann['score'] < args.score_thres:
-                continue
-
             if args.use_iou:
                 iou_score = get_iou_score(gt_ann['bbox'], pred_ann['bbox'])
-                if args.iou_thres < iou_score:
+                if args.iou_thres < iou_score and pred_ann['score'] > args.score_thres:
                     stats[category_id]['LL'] += 1
                     is_ll = True
+                    id_to_annotation[image_id].remove(gt_ann)
             else:
                 gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
                 if pr_bbox_center[0] > gt_x and \
                    pr_bbox_center[0] < gt_x + gt_w and \
                    pr_bbox_center[1] > gt_y and \
-                   pr_bbox_center[1] < gt_y + gt_h:
+                   pr_bbox_center[1] < gt_y + gt_h and \
+                   pred_ann['score'] > args.score_thres:
                     stats[category_id]['LL'] += 1
                     is_ll = True
+                    id_to_annotation[image_id].remove(gt_ann)
 
-        if not is_ll:
+        if not is_ll and pred_ann['score'] > args.score_thres:
             stats[category_id]['NL'] += 1
 
     return stats
@@ -119,8 +119,6 @@ def update_stats(gt, pr, id_to_annotation, stats, args):
 def run(args):
     gt = load_json_from_file(args.gt_ann)
     pr = load_json_from_file(args.pred_ann)
-
-    pr = update_scores(pr, args.score_thres)
 
     categories = gt['categories']
 
@@ -141,16 +139,14 @@ if __name__ == "__main__":
         '--use_iou',
         default=False,
         action="store_true",
-        help=
-        "Use IoU score to decide on `proximity` rather then using center pixel inside GT box."
+        help="Use IoU score to decide on `proximity` rather then using center pixel inside GT box."
     )
     parser.add_argument(
         '--iou_thres',
         default=.75,
         type=float,
         required=False,
-        help=
-        'If IoU score is used the default threshold is arbitrarily set to .75')
+        help='If IoU score is used the default threshold is arbitrarily set to .75')
     parser.add_argument('--score_thres',
                         default=.5,
                         type=float,
