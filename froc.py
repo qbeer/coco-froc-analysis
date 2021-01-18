@@ -99,11 +99,12 @@ def update_stats(gt, pr, gt_id_to_annotation, pr_id_to_annotation, stats,
 
             is_ll = False
 
-            for gt_ann in gt_id_to_annotation[image_id]:
+            for gt_ann in gt_id_to_annotation.get(image_id, []):
                 if category_id != gt_ann['category_id']:
                     continue
 
                 if pred_ann['score'] < args.score_thres:
+                    print(pred_ann['score'], args.score_thres)
                     continue
 
                 if not args.use_iou:
