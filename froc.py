@@ -17,11 +17,14 @@ def update_scores(json_data, score_thres):
         scores.append(pred['score'])
     scores = np.array(scores)
     scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))
+
+    preds = []
     for ind, pred in enumerate(json_data):
         pred['score'] = scores[ind]
-        if pred['score'] < score_thres:
-            json_data.remove(pred)
-    return json_data
+        if pred['score'] > score_thres:
+            preds.append(pred)
+
+    return preds
 
 
 def init_statistics(gt, categories):
@@ -48,7 +51,16 @@ def init_statistics(gt, categories):
     return stats
 
 
-def build_id_to_annotation_dict(gt):
+def build_pr_id_to_annotation_dict(pr):
+    id_to_annotation = dict()
+    for annotation in pr:
+        id_to_annotation[annotation['image_id']] = []
+    for annotation in pr:
+        id_to_annotation[annotation['image_id']].append(annotation)
+    return id_to_annotation
+
+
+def build_gt_id_to_annotation_dict(gt):
     id_to_annotation = dict()
     for image in gt['images']:
         id_to_annotation[image['id']] = []
@@ -76,42 +88,44 @@ def get_iou_score(gt_box, pr_box):
     return intersection / (gt_area + pr_area - intersection)
 
 
-def update_stats(gt, pr, id_to_annotation, stats, args):
+def update_stats(gt, pr, gt_id_to_annotation, pr_id_to_annotation, stats,
+                 args):
     if type(pr) == dict:
         pr = pr['annotations']
 
-    for pred_ann in pr:
-        image_id = pred_ann['image_id']
-        category_id = pred_ann['category_id']
+    for image_id in pr_id_to_annotation:
+        for pred_ann in pr_id_to_annotation[image_id]:
+            category_id = pred_ann['category_id']
 
-        if not args.use_iou:
-            pr_x, pr_y, pr_w, pr_h = pred_ann['bbox']
-            pr_bbox_center = pr_x + pr_w / 2, pr_y + pr_h / 2
+            is_ll = False
 
-        is_ll = False
-        for gt_ann in id_to_annotation[image_id]:
-            if category_id != gt_ann['category_id']:
-                continue
+            for gt_ann in gt_id_to_annotation[image_id]:
+                if category_id != gt_ann['category_id']:
+                    continue
 
-            if args.use_iou:
-                iou_score = get_iou_score(gt_ann['bbox'], pred_ann['bbox'])
-                if args.iou_thres < iou_score and pred_ann['score'] > args.score_thres:
-                    stats[category_id]['LL'] += 1
-                    is_ll = True
-                    id_to_annotation[image_id].remove(gt_ann)
-            else:
-                gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
-                if pr_bbox_center[0] > gt_x and \
-                   pr_bbox_center[0] < gt_x + gt_w and \
-                   pr_bbox_center[1] > gt_y and \
-                   pr_bbox_center[1] < gt_y + gt_h and \
-                   pred_ann['score'] > args.score_thres:
-                    stats[category_id]['LL'] += 1
-                    is_ll = True
-                    id_to_annotation[image_id].remove(gt_ann)
+                if pred_ann['score'] < args.score_thres:
+                    continue
 
-        if not is_ll and pred_ann['score'] > args.score_thres:
-            stats[category_id]['NL'] += 1
+                if not args.use_iou:
+                    pr_x, pr_y, pr_w, pr_h = pred_ann['bbox']
+                    pr_bbox_center = pr_x + pr_w / 2, pr_y + pr_h / 2
+
+                if args.use_iou:
+                    iou_score = get_iou_score(gt_ann['bbox'], pred_ann['bbox'])
+                    if args.iou_thres < iou_score:
+                        stats[category_id]['LL'] += 1
+                        is_ll = True
+                else:
+                    gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
+                    if pr_bbox_center[0] > gt_x and \
+                    pr_bbox_center[0] < gt_x + gt_w and \
+                    pr_bbox_center[1] > gt_y and \
+                    pr_bbox_center[1] < gt_y + gt_h:
+                        stats[category_id]['LL'] += 1
+                        is_ll = True
+
+            if not is_ll:
+                stats[category_id]['NL'] += 1
 
     return stats
 
@@ -120,13 +134,17 @@ def run(args):
     gt = load_json_from_file(args.gt_ann)
     pr = load_json_from_file(args.pred_ann)
 
+    pr = update_scores(pr, args.score_thres)
+
     categories = gt['categories']
 
     stats = init_statistics(gt, categories)
 
-    id_to_annotation = build_id_to_annotation_dict(gt)
+    gt_id_to_annotation = build_gt_id_to_annotation_dict(gt)
+    pr_id_to_annotation = build_pr_id_to_annotation_dict(pr)
 
-    stats = update_stats(gt, pr, id_to_annotation, stats, args)
+    stats = update_stats(gt, pr, gt_id_to_annotation, pr_id_to_annotation,
+                         stats, args)
 
     return stats
 
@@ -139,14 +157,16 @@ if __name__ == "__main__":
         '--use_iou',
         default=False,
         action="store_true",
-        help="Use IoU score to decide on `proximity` rather then using center pixel inside GT box."
+        help=
+        "Use IoU score to decide on `proximity` rather then using center pixel inside GT box."
     )
     parser.add_argument(
         '--iou_thres',
         default=.75,
         type=float,
         required=False,
-        help='If IoU score is used the default threshold is arbitrarily set to .75')
+        help=
+        'If IoU score is used the default threshold is arbitrarily set to .75')
     parser.add_argument('--score_thres',
                         default=.5,
                         type=float,
