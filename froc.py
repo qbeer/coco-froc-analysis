@@ -2,7 +2,9 @@ import argparse
 import json
 from pathlib import Path
 from pprint import pprint
+from matplotlib.pyplot import winter
 import numpy as np
+from numpy.core.arrayprint import printoptions
 
 
 def load_json_from_file(file_path):
@@ -88,45 +90,40 @@ def get_iou_score(gt_box, pr_box):
     return intersection / (gt_area + pr_area - intersection)
 
 
-def update_stats(gt, pr, gt_id_to_annotation, pr_id_to_annotation, stats,
+def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
                  args):
-    if type(pr) == dict:
-        pr = pr['annotations']
-
-    for image_id in pr_id_to_annotation:
-        for pred_ann in pr_id_to_annotation[image_id]:
-            category_id = pred_ann['category_id']
-
+    for image_id in gt_id_to_annotation:
+        for gt_ann in gt_id_to_annotation[image_id]:
             is_ll = False
 
-            for gt_ann in gt_id_to_annotation.get(image_id, []):
-                if category_id != gt_ann['category_id']:
+            for pred_ann in pr_id_to_annotation.get(image_id, []):
+                if gt_ann['category_id'] != pred_ann['category_id']:
                     continue
 
                 if pred_ann['score'] < args.score_thres:
                     print(pred_ann['score'], args.score_thres)
                     continue
 
-                if not args.use_iou:
-                    pr_x, pr_y, pr_w, pr_h = pred_ann['bbox']
-                    pr_bbox_center = pr_x + pr_w / 2, pr_y + pr_h / 2
-
                 if args.use_iou:
                     iou_score = get_iou_score(gt_ann['bbox'], pred_ann['bbox'])
                     if args.iou_thres < iou_score:
-                        stats[category_id]['LL'] += 1
+                        stats[gt_ann['category_id']]['LL'] += 1
                         is_ll = True
                 else:
                     gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
-                    if pr_bbox_center[0] > gt_x and \
-                    pr_bbox_center[0] < gt_x + gt_w and \
-                    pr_bbox_center[1] > gt_y and \
-                    pr_bbox_center[1] < gt_y + gt_h:
-                        stats[category_id]['LL'] += 1
+
+                    pr_x, pr_y, pr_w, pr_h = pred_ann['bbox']
+                    pr_bbox_center = pr_x + pr_w / 2, pr_y + pr_h / 2
+
+                    if pr_bbox_center[0] >= gt_x and \
+                            pr_bbox_center[0] <= gt_x + gt_w and \
+                            pr_bbox_center[1] >= gt_y and \
+                            pr_bbox_center[1] <= gt_y + gt_h:
+                        stats[gt_ann['category_id']]['LL'] += 1
                         is_ll = True
 
-            if not is_ll:
-                stats[category_id]['NL'] += 1
+                if not is_ll:
+                    stats[gt_ann['category_id']]['NL'] += 1
 
     return stats
 
@@ -144,7 +141,7 @@ def run(args):
     gt_id_to_annotation = build_gt_id_to_annotation_dict(gt)
     pr_id_to_annotation = build_pr_id_to_annotation_dict(pr)
 
-    stats = update_stats(gt, pr, gt_id_to_annotation, pr_id_to_annotation,
+    stats = update_stats(gt_id_to_annotation, pr_id_to_annotation,
                          stats, args)
 
     return stats
@@ -158,16 +155,14 @@ if __name__ == "__main__":
         '--use_iou',
         default=False,
         action="store_true",
-        help=
-        "Use IoU score to decide on `proximity` rather then using center pixel inside GT box."
+        help="Use IoU score to decide on `proximity` rather then using center pixel inside GT box."
     )
     parser.add_argument(
         '--iou_thres',
         default=.75,
         type=float,
         required=False,
-        help=
-        'If IoU score is used the default threshold is arbitrarily set to .75')
+        help='If IoU score is used the default threshold is arbitrarily set to .75')
     parser.add_argument('--score_thres',
                         default=.5,
                         type=float,
