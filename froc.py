@@ -109,6 +109,7 @@ def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
                     if args.iou_thres < iou_score:
                         stats[gt_ann['category_id']]['LL'] += 1
                         is_ll = True
+                        break
                 else:
                     gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
 
@@ -121,6 +122,7 @@ def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
                             pr_bbox_center[1] <= gt_y + gt_h:
                         stats[gt_ann['category_id']]['LL'] += 1
                         is_ll = True
+                        break
 
                 if not is_ll:
                     stats[gt_ann['category_id']]['NL'] += 1
