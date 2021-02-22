@@ -2,9 +2,8 @@ import argparse
 import json
 from pathlib import Path
 from pprint import pprint
-from matplotlib.pyplot import winter
 import numpy as np
-from numpy.core.arrayprint import printoptions
+from collections import Counter
 
 
 def load_json_from_file(file_path):
@@ -87,10 +86,12 @@ def get_iou_score(gt_box, pr_box):
 
 
 def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
-                 args):
+                 categories, args):
     for image_id in gt_id_to_annotation:
+        n_is_ll = dict()
+        for cat in categories:
+            n_is_ll[cat['id']] = 0
         for gt_ann in gt_id_to_annotation[image_id]:
-            is_ll = False
             for pred_ann in pr_id_to_annotation.get(image_id, []):
                 if gt_ann['category_id'] != pred_ann['category_id']:
                     continue
@@ -99,7 +100,7 @@ def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
                     iou_score = get_iou_score(gt_ann['bbox'], pred_ann['bbox'])
                     if args.iou_thres < iou_score:
                         stats[gt_ann['category_id']]['LL'] += 1
-                        is_ll = True
+                        n_is_ll[gt_ann['category_id']] += 1
                         break
                 else:
                     gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
@@ -112,13 +113,16 @@ def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
                             pr_bbox_center[1] >= gt_y and \
                             pr_bbox_center[1] <= gt_y + gt_h:
                         stats[gt_ann['category_id']]['LL'] += 1
-                        is_ll = True
+                        n_is_ll[gt_ann['category_id']] += 1
                         break
 
-            if len(pr_id_to_annotation.get(image_id, [])) > 0:
-                stats[gt_ann['category_id']]['NL'] += len(pr_id_to_annotation.get(image_id, []))
-                if is_ll:
-                    stats[gt_ann['category_id']]['NL'] -= 1
+        cat_to_n_gt = Counter([gt_ann['category_id'] for gt_ann in gt_id_to_annotation[image_id]])
+        cat_to_n_pred = Counter([pr_ann['category_id'] for pr_ann in pr_id_to_annotation.get(image_id, [])])
+
+        difference = cat_to_n_pred - Counter(n_is_ll)
+        print(cat_to_n_gt, cat_to_n_pred, Counter(n_is_ll), difference)
+        for cat_id in difference:
+            stats[cat_id]['NL'] += difference[cat_id]
 
     return stats
 
@@ -137,7 +141,7 @@ def run(args):
     pr_id_to_annotation = build_pr_id_to_annotation_dict(pr)
 
     stats = update_stats(gt_id_to_annotation, pr_id_to_annotation,
-                         stats, args)
+                         stats, categories, args)
 
     return stats
 
