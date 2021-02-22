@@ -14,15 +14,8 @@ def load_json_from_file(file_path):
 
 
 def update_scores(json_data, score_thres):
-    scores = []
-    for pred in json_data:
-        scores.append(pred['score'])
-    scores = np.array(scores)
-    scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores))
-
     preds = []
     for ind, pred in enumerate(json_data):
-        pred['score'] = scores[ind]
         if pred['score'] > score_thres:
             preds.append(pred)
 
@@ -35,7 +28,7 @@ def init_statistics(gt, categories):
             'name': cat['name'],
             'LL': 0,
             'NL': 0,
-            'n_images': set(),
+            'n_images': [],
             'n_lesions': 0
         }
         for cat in categories
@@ -43,9 +36,12 @@ def init_statistics(gt, categories):
 
     for annotation in gt['annotations']:
         category_id = annotation['category_id']
-        image_id = annotation['image_id']
-        stats[category_id]['n_images'].add(image_id)
         stats[category_id]['n_lesions'] += 1
+
+    for image in gt['images']:
+        image_id = image['id']
+        for cat_id in stats:
+            stats[cat_id]['n_images'].append(image_id)
 
     for cat_id in stats:
         stats[cat_id]['n_images'] = len(stats[cat_id]['n_images'])
@@ -95,13 +91,8 @@ def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
     for image_id in gt_id_to_annotation:
         for gt_ann in gt_id_to_annotation[image_id]:
             is_ll = False
-
             for pred_ann in pr_id_to_annotation.get(image_id, []):
                 if gt_ann['category_id'] != pred_ann['category_id']:
-                    continue
-
-                if pred_ann['score'] < args.score_thres:
-                    print(pred_ann['score'], args.score_thres)
                     continue
 
                 if args.use_iou:
@@ -124,8 +115,10 @@ def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
                         is_ll = True
                         break
 
-                if not is_ll:
-                    stats[gt_ann['category_id']]['NL'] += 1
+            if len(pr_id_to_annotation.get(image_id, [])) > 0:
+                stats[gt_ann['category_id']]['NL'] += len(pr_id_to_annotation.get(image_id, []))
+                if is_ll:
+                    stats[gt_ann['category_id']]['NL'] -= 1
 
     return stats
 
