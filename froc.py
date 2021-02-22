@@ -116,11 +116,9 @@ def update_stats(gt_id_to_annotation, pr_id_to_annotation, stats,
                         n_is_ll[gt_ann['category_id']] += 1
                         break
 
-        cat_to_n_gt = Counter([gt_ann['category_id'] for gt_ann in gt_id_to_annotation[image_id]])
         cat_to_n_pred = Counter([pr_ann['category_id'] for pr_ann in pr_id_to_annotation.get(image_id, [])])
 
         difference = cat_to_n_pred - Counter(n_is_ll)
-        print(cat_to_n_gt, cat_to_n_pred, Counter(n_is_ll), difference)
         for cat_id in difference:
             stats[cat_id]['NL'] += difference[cat_id]
 
