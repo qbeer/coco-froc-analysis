@@ -1,8 +1,4 @@
-import argparse
-import json
-import numpy as np
 from collections import Counter
-
 
 def init_stats(gt: dict, categories: dict) -> dict:
     """Initializing the statistics before counting leasion
@@ -13,7 +9,7 @@ def init_stats(gt: dict, categories: dict) -> dict:
         categories {dict} -- Dictionary of categories present in the COCO dataset
 
     Returns:
-        stats {dict} -- Statistics to be updated, containing every information 
+        stats {dict} -- Statistics to be updated, containing every information
                         necessary to evaluate a single FROC point
     """
     stats = {

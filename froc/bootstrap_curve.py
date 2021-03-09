@@ -1,5 +1,11 @@
 from .froc_curve import generate_froc_curve
 from copy import deepcopy
+import json
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+import random
+import os
+import numpy as np
 
 
 def generate_bootstrap_curves(
@@ -24,7 +30,7 @@ def generate_bootstrap_curves(
 
     collected_frocs = {"lls": {}, "nlls": {}}
 
-    for _ in tqdm.tqdm(range(n_bootstrap_samples)):
+    for _ in tqdm(range(n_bootstrap_samples)):
         selected_images = random.choices(GT_ANN["images"], k=n_images)
         bootstrap_gt = deepcopy(GT_ANN)
 
@@ -52,8 +58,14 @@ def generate_bootstrap_curves(
         tmp_gt_ann = "/tmp/tmp_bootstrap_gt.json"
         tmp_pred_ann = "/tmp/tmp_bootstrap_pred.json"
 
-        lls, nlls = create_froc_curve(
-            tmp_gt_ann, tmp_pred_ann, use_iou, iou_thres, n_sample_points
+        lls, nlls = generate_froc_curve(
+            tmp_gt_ann,
+            tmp_pred_ann,
+            use_iou,
+            iou_thres,
+            n_sample_points,
+            plot_title=None,
+            plot_output_path=None,
         )
 
         for cat_id in lls:
@@ -69,13 +81,13 @@ def generate_bootstrap_curves(
     for cat_id in collected_frocs["lls"]:
         mean_froc_lls[cat_id] = np.mean(
             np.array(collected_frocs["lls"][cat_id]).reshape(
-                args.n_samples, args.n_sample_points
+                n_bootstrap_samples, n_sample_points
             ),
             axis=0,
         )
         mean_froc_nlls[cat_id] = np.mean(
             np.array(collected_frocs["nlls"][cat_id]).reshape(
-                args.n_samples, args.n_sample_points
+                n_bootstrap_samples, n_sample_points
             ),
             axis=0,
         )

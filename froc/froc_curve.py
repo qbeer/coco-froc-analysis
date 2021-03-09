@@ -7,7 +7,7 @@ from .utils import (
 )
 import matplotlib.pyplot as plt
 import numpy as np
-import tqdm
+from tqdm import tqdm
 
 
 def froc_point(gt_ann, pred_ann, score_thres, use_iou, iou_thres):
@@ -18,7 +18,7 @@ def froc_point(gt_ann, pred_ann, score_thres, use_iou, iou_thres):
 
     categories = gt["categories"]
 
-    stats = init_statistics(gt, categories)
+    stats = init_stats(gt, categories)
 
     gt_id_to_annotation = build_gt_id2annotations(gt)
     pr_id_to_annotation = build_pr_id2annotations(pr)
@@ -36,9 +36,7 @@ def generate_froc_curve(
     lls_accuracy = {}
     nlls_per_image = {}
 
-    for score_thres in tqdm.tqdm(
-        np.linspace(0.0, 1.0, n_sample_points, endpoint=False)
-    ):
+    for score_thres in tqdm(np.linspace(0.0, 1.0, n_sample_points, endpoint=False)):
         stats = froc_point(gt_ann, pred_ann, score_thres, use_iou, iou_thres)
         for category_id in stats:
             if lls_accuracy.get(category_id, None):
@@ -62,7 +60,7 @@ def generate_froc_curve(
                 )
 
     if plot_title:
-        fig = plt.figure(figsize=(12, 12))
+        plt.figure(figsize=(12, 12))
 
     for category_id in lls_accuracy:
         lls = lls_accuracy[category_id]

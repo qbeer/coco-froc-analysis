@@ -1,0 +1,40 @@
+name: Python Package using Conda
+
+on: [push]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          $CONDA/bin/pip install -r requirements_dev.txt
+          $CONDA/bin/pip install -r requirements.txt
+      - name: Lint with flake8
+        run: |
+          $CONDA/bin/conda install flake8
+          # stop the build if there are Python syntax errors or undefined names
+          $CONDA/bin/flake8 froc --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          $CONDA/bin/flake8 froc --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with unittest and coverage
+        run: |
+          $CONDA/bin/coverage run -m unittest -v
+          $CONDA/bin/coverage xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: 9ccd711a-2c5a-46e4-8716-2ab76db31782
+          file: ./coverage.xml
+          flags: unittests
+          env_vars: OS,PYTHON
+          name: codecov-umbrella
+          fail_ci_if_error: true
