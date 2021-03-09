@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="coco_froc_analysis", # Replace with your own username
+    name="coco_froc_analysis",
     version="0.0.1",
     author="Alex Olar",
     author_email="olaralex666@gmail.com",
