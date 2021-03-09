@@ -1,5 +1,6 @@
 *.json
 .vscode/
+coco-froc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

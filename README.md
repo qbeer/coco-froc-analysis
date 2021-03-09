@@ -1,10 +1,10 @@
 # COCO FROC analysis
 
-FROC analysis for COCO annotations and Detectron2 results. The COCO annotation style is defined [here]().
+FROC analysis for COCO annotations and Detectron(2) results. The COCO annotation style is defined [here](https://cocodataset.org/).
 
 ### Example
 
-A single annotation record in the file might look like this:
+A single annotation record in the ground-truth file might look like this:
 
 ```json
 {
@@ -42,28 +42,13 @@ The FROC analysis counts the number of images, number of lesions in the ground t
 No dependencies.
 
 ```bash
-python froc.py --gt_ann <path_to_ground_truth_annotation_in_COCO_format>\
-               --pred_ann <path_to_prediction_annotation_in_COCO_format>\
-               --use_iou <flag_parameter_if_used_then_it_is_automatically_set_to_true>\
-               --iou_thres <can_be_used_with_the_above_optional_flag>\
-               --score_thres <score_threshold_default_0.5>
-# arguments are required: --gt_ann, --pred_ann
+python froc_analysis.py --gt_ann <path_to_ground_truth_annotation_in_COCO_format>\
+                        --pred_ann <path_to_prediction_annotation_in_COCO_format>\
+                        --use_iou <flag_parameter_if_used_then_it_is_automatically_set_to_true>\
+                        --iou_thres <will_be_used_with_the_above_optional_flag>\
+                        --plot_title <custumize_the_title_of_the_plot>\
+                        --plot_output_path <costumize_the_plot_output_path>
+# arguments that are required: --gt_ann, --pred_ann
 ```
 
-By default centroid closeness is used, if the `--use_iou` flag is set, `--iou_thres` defaults to `.75` while the `--score_thres` score defaults to `.5`. The code outputs statistics in the dictionary of form:
-
-```python
-{
-    1 : # category id
-    {'LL': ..., # lesion-localization count
-     'NL': ..., # non-lesion localization count
-     'n_images': ...,
-     'n_lesions': ...,
-     'name': ...}, # category name
-...
-}
-```
-
-By setting the confidence of the predictor you can generate points on the FROC curve.
-
-## @Regards, Alex
+By default centroid closeness is used, if the `--use_iou` flag is set, `--iou_thres` defaults to `.75` while the `--score_thres` score defaults to `.5`. The code outputs the FROC curve on the given detection results and GT dataset.
