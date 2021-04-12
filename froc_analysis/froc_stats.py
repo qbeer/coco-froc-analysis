@@ -1,6 +1,7 @@
 from collections import Counter
 from .utils import get_iou_score
 
+
 def init_stats(gt: dict, categories: dict) -> dict:
     """Initializing the statistics before counting leasion
        and non-leasion localiazations.

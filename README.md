@@ -1,8 +1,14 @@
 # COCO FROC analysis
 
-FROC analysis for COCO annotations and Detectron(2) results. The COCO annotation style is defined [here](https://cocodataset.org/).
+FROC analysis for COCO annotations and Detectron(2) detection results. The COCO annotation style is defined [here](https://cocodataset.org/).
 
-### Example
+### Installation
+
+```bash
+pip install coco-froc-analysis
+```
+
+### About
 
 A single annotation record in the ground-truth file might look like this:
 
@@ -39,16 +45,45 @@ The FROC analysis counts the number of images, number of lesions in the ground t
 
 ## Usage
 
-No dependencies.
+```python
+from froc_analysis import generate_froc_curve, generate_bootstrap_curves
+
+# For single FROC curve
+generate_froc_curve(gt_ann='<path-to-your-ground-thruth-annotation-file>',
+                    pr_ann='<path-to-Detectron2-or-mmdetection-prediction-file>',
+                    use_iou=False, iou_thres=.5, n_sample_points=75,
+                    plot_title='FROC', plot_output_path='froc.png')
+
+# For bootstrapped curves
+generate_bootstrap_curves(gt_ann='<path-to-your-ground-thruth-annotation-file>',
+                          pr_ann='<path-to-Detectron2-or-mmdetection-prediction-file>',
+                          n_bootstrap_samples=5,
+                          use_iou=False, iou_thres=.5, n_sample_points=25,
+                          plot_title='FROC', plot_output_path='froc.png')
+```
+
+## CLI Usage
 
 ```bash
-python froc_analysis.py --gt_ann <path_to_ground_truth_annotation_in_COCO_format>\
-                        --pred_ann <path_to_prediction_annotation_in_COCO_format>\
-                        --use_iou <flag_parameter_if_used_then_it_is_automatically_set_to_true>\
-                        --iou_thres <will_be_used_with_the_above_optional_flag>\
-                        --plot_title <custumize_the_title_of_the_plot>\
-                        --plot_output_path <costumize_the_plot_output_path>
-# arguments that are required: --gt_ann, --pred_ann
+usage: froc_analysis.py [-h] [--bootstrap] --gt_ann GT_ANN --pred_ann PRED_ANN [--use_iou] [--iou_thres IOU_THRES] [--n_sample_points N_SAMPLE_POINTS] [--n_bootstrap_samples N_BOOTSTRAP_SAMPLES]
+                        [--plot_title PLOT_TITLE] [--plot_output_path PLOT_OUTPUT_PATH]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --bootstrap           Whether to do a single or bootstrap runs.
+  --gt_ann GT_ANN
+  --pred_ann PRED_ANN
+  --use_iou             Use IoU score to decide on `proximity` rather then using center pixel inside GT box.
+  --iou_thres IOU_THRES
+                        If IoU score is used the default threshold is arbitrarily set to .5
+  --n_sample_points N_SAMPLE_POINTS
+                        Number of points to evaluate the FROC curve at.
+  --n_bootstrap_samples N_BOOTSTRAP_SAMPLES
+                        Number of bootstrap samples.
+  --plot_title PLOT_TITLE
+  --plot_output_path PLOT_OUTPUT_PATH
 ```
 
 By default centroid closeness is used, if the `--use_iou` flag is set, `--iou_thres` defaults to `.75` while the `--score_thres` score defaults to `.5`. The code outputs the FROC curve on the given detection results and GT dataset.
+
+## @Regards, Alex

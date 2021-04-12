@@ -31,9 +31,13 @@ def froc_point(gt_ann, pr_ann, score_thres, use_iou, iou_thres):
 
 
 def generate_froc_curve(
-    gt_ann, pr_ann, use_iou=False,
-    iou_thres=.5, n_sample_points=50,
-    plot_title='FROC curve', plot_output_path='froc.png'
+    gt_ann,
+    pr_ann,
+    use_iou=False,
+    iou_thres=0.5,
+    n_sample_points=50,
+    plot_title="FROC curve",
+    plot_output_path="froc.png",
 ):
     lls_accuracy = {}
     nlls_per_image = {}
