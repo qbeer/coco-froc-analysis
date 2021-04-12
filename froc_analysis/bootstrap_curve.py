@@ -1,7 +1,7 @@
 from copy import deepcopy
 import json
 import matplotlib.pyplot as plt
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import random
 import os
 import numpy as np
@@ -12,12 +12,12 @@ from .froc_curve import generate_froc_curve
 def generate_bootstrap_curves(
     gt_ann,
     pr_ann,
-    n_bootstrap_samples,
-    use_iou,
-    iou_thres,
-    n_sample_points,
-    plot_title,
-    plot_output_path,
+    n_bootstrap_samples=5,
+    use_iou=False,
+    iou_thres=.5,
+    n_sample_points=50,
+    plot_title='Bootstrap FROC',
+    plot_output_path='froc_bootstrapped.png',
 ):
     with open(gt_ann, "r+") as fp:
         GT_ANN = json.load(fp)
@@ -70,11 +70,15 @@ def generate_bootstrap_curves(
         )
 
         for cat_id in lls:
-            plt.semilogx(lls[cat_id], nlls[cat_id], "-", alpha=0.05)
-            collected_frocs["lls"].get(cat_id, []).append(lls[cat_id])
-            collected_frocs["nlls"].get(cat_id, []).append(nlls[cat_id])
+            if collected_frocs['lls'].get(cat_id, None) is None:
+                collected_frocs["lls"] = {cat_id : []}
+            if collected_frocs['nlls'].get(cat_id, None) is None:
+                collected_frocs["nlls"] = {cat_id : []}
 
-        collected_frocs.append((lls, nlls))
+        for cat_id in lls:
+            plt.semilogx(nlls[cat_id], lls[cat_id], "b--", alpha=0.15)
+            collected_frocs["lls"][cat_id].append(lls[cat_id])
+            collected_frocs["nlls"][cat_id].append(nlls[cat_id])
 
     mean_froc_lls = {}
     mean_froc_nlls = {}
@@ -94,15 +98,19 @@ def generate_bootstrap_curves(
         )
 
     mean_froc_curve = {}
+
+
+
     for cat_id in collected_frocs["lls"]:
         mean_froc_curve[cat_id] = np.stack(
             (mean_froc_nlls[cat_id], mean_froc_lls[cat_id]), axis=-1
         )
-
-        plt.semilogx(mean_froc_curve[cat_id][:, 0], mean_froc_curve[cat_id][:, 1], "x-")
-
+        plt.semilogx(mean_froc_curve[cat_id][:, 0], mean_froc_curve[cat_id][:, 1], "bx-",
+        label='mean')
     plt.xlabel("FP/image")
     plt.ylabel("Sensitivity")
+
+    plt.legend(loc='upper left')
 
     os.remove("/tmp/tmp_bootstrap_gt.json")
     os.remove("/tmp/tmp_bootstrap_pred.json")

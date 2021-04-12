@@ -85,8 +85,8 @@ class TestFrocCurve(unittest.TestCase):
             plot_title=None,
             plot_output_path=None,
         )
-        self.assertListEqual(lls, [1.0 for _ in range(10)])
-        self.assertListEqual(nlls, [0.0 for _ in range(10)])
+        self.assertListEqual(lls[8], [1.0 for _ in range(10)])
+        self.assertListEqual(nlls[8], [0.0 for _ in range(10)])
 
     @mock.patch("froc_analysis.froc_curve.tqdm", notqdm)
     def test_froc_curve_generation_for_single_error_per_image(self):
@@ -99,8 +99,8 @@ class TestFrocCurve(unittest.TestCase):
             plot_title=None,
             plot_output_path=None,
         )
-        self.assertListEqual(lls, [0.7 for _ in range(10)])
-        self.assertListEqual(nlls, [0.0 for _ in range(10)])
+        self.assertListEqual(lls[8], [0.7 for _ in range(10)])
+        self.assertListEqual(nlls[8], [0.0 for _ in range(10)])
 
     @mock.patch("froc_analysis.froc_curve.tqdm", notqdm)
     def test_froc_curve_generation_for_single_error_per_image_low_confidence(self):
@@ -113,8 +113,8 @@ class TestFrocCurve(unittest.TestCase):
             plot_title=None,
             plot_output_path=None,
         )
-        self.assertListEqual(lls, [0.7 for _ in range(3)] + [0.0 for _ in range(7)])
-        self.assertListEqual(nlls, [0.0 for _ in range(10)])
+        self.assertListEqual(lls[8], [0.7 for _ in range(3)] + [0.0 for _ in range(7)])
+        self.assertListEqual(nlls[8], [0.0 for _ in range(10)])
 
     @mock.patch("froc_analysis.froc_curve.tqdm", notqdm)
     def test_froc_curve_saving_to_plot(self):

@@ -7,23 +7,25 @@ def run(args):
     if args.bootstrap:
         print("Generating bootstrap curves... (this may take a while)")
         generate_bootstrap_curves(
-            args.gt_ann,
-            args.pred_ann,
-            args.n_bootstrap_samples,
-            args.use_iou,
-            args.iou_thres,
-            args.plot_title,
-            args.plot_output_path,
+            gt_ann=args.gt_ann,
+            pr_ann=args.pred_ann,
+            n_bootstrap_samples=args.n_bootstrap_samples,
+            use_iou=args.use_iou,
+            iou_thres=args.iou_thres,
+            n_sample_points=args.n_sample_points,
+            plot_title=args.plot_title,
+            plot_output_path=args.plot_output_path
         )
     else:
         print("Generating single FROC curve...")
         generate_froc_curve(
-            args.gt_ann,
-            args.pred_ann,
-            args.use_iou,
-            args.iou_thres,
-            args.plot_title,
-            args.plot_output_path,
+            gt_ann=args.gt_ann,
+            pr_ann=args.pred_ann,
+            use_iou=args.use_iou,
+            iou_thres=args.iou_thres,
+            n_sample_points=args.n_sample_points,
+            plot_title=args.plot_title,
+            plot_output_path=args.plot_output_path
         )
 
 
@@ -51,14 +53,20 @@ if __name__ == "__main__":
         help="If IoU score is used the default threshold is arbitrarily set to .5",
     )
     parser.add_argument(
+        "--n_sample_points",
+        type=int,
+        default=50,
+        help='Number of points to evaluate the FROC curve at.'
+    )
+    parser.add_argument(
         "--n_bootstrap_samples",
         default=25,
         type=int,
         required=False,
         help="Number of bootstrap samples.",
     )
-    parser.add_argument("--plot_title", type=str, required=True)
-    parser.add_argument("--plot_output_path", type=str, required=True)
+    parser.add_argument("--plot_title", type=str, default='FROC')
+    parser.add_argument("--plot_output_path", type=str, default='froc.png')
 
     args = parser.parse_args()
 

@@ -7,12 +7,12 @@ from .utils import (
 )
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 
-def froc_point(gt_ann, pred_ann, score_thres, use_iou, iou_thres):
+def froc_point(gt_ann, pr_ann, score_thres, use_iou, iou_thres):
     gt = load_json_from_file(gt_ann)
-    pr = load_json_from_file(pred_ann)
+    pr = load_json_from_file(pr_ann)
 
     pr = update_scores(pr, score_thres)
 
@@ -31,13 +31,15 @@ def froc_point(gt_ann, pred_ann, score_thres, use_iou, iou_thres):
 
 
 def generate_froc_curve(
-    gt_ann, pred_ann, use_iou, iou_thres, n_sample_points, plot_title, plot_output_path
+    gt_ann, pr_ann, use_iou=False,
+    iou_thres=.5, n_sample_points=50,
+    plot_title='FROC curve', plot_output_path='froc.png'
 ):
     lls_accuracy = {}
     nlls_per_image = {}
 
     for score_thres in tqdm(np.linspace(0.0, 1.0, n_sample_points, endpoint=False)):
-        stats = froc_point(gt_ann, pred_ann, score_thres, use_iou, iou_thres)
+        stats = froc_point(gt_ann, pr_ann, score_thres, use_iou, iou_thres)
         for category_id in stats:
             if lls_accuracy.get(category_id, None):
                 lls_accuracy[category_id].append(
@@ -79,4 +81,4 @@ def generate_froc_curve(
 
         plt.savefig(plot_output_path, dpi=50)
     else:
-        return lls, nlls
+        return lls_accuracy, nlls_per_image
