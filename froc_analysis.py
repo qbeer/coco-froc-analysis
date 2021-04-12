@@ -1,6 +1,6 @@
 import argparse
-from froc.froc_curve import generate_froc_curve
-from froc.bootstrap_curve import generate_bootstrap_curves
+from froc_analysis import generate_froc_curve
+from froc_analysis import generate_bootstrap_curves
 
 
 def run(args):

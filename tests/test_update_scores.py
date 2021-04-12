@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from froc.utils import update_scores
+from froc_analysis.utils import update_scores
 
 
 class TestUpdateScore(unittest.TestCase):

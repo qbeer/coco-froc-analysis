@@ -1,6 +1,6 @@
 import unittest
 
-from froc.utils import build_pr_id2annotations, build_gt_id2annotations
+from froc_analysis.utils import build_pr_id2annotations, build_gt_id2annotations
 
 
 class TestId2Annotation(unittest.TestCase):

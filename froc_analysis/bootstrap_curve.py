@@ -1,4 +1,3 @@
-from .froc_curve import generate_froc_curve
 from copy import deepcopy
 import json
 import matplotlib.pyplot as plt
@@ -6,6 +5,8 @@ from tqdm import tqdm
 import random
 import os
 import numpy as np
+
+from .froc_curve import generate_froc_curve
 
 
 def generate_bootstrap_curves(

@@ -1,5 +1,5 @@
 import unittest
-from froc.utils import get_iou_score
+from froc_analysis.utils import get_iou_score
 
 
 class TestIoU(unittest.TestCase):
