@@ -6,7 +6,8 @@ import random
 import os
 import numpy as np
 
-from .froc_curve import generate_froc_curve
+from .froc_curve import generate_froc_curve, froc_point, calc_scores
+from .utils import transform_gt_into_pr
 
 
 def generate_bootstrap_curves(
@@ -18,11 +19,12 @@ def generate_bootstrap_curves(
     n_sample_points=50,
     plot_title="Bootstrap FROC",
     plot_output_path="froc_bootstrapped.png",
+    test_ann=None
 ):
-    with open(gt_ann, "r+") as fp:
+    with open(gt_ann, "r") as fp:
         GT_ANN = json.load(fp)
 
-    with open(pr_ann, "r+") as fp:
+    with open(pr_ann, "r") as fp:
         PRED_ANN = json.load(fp)
 
     n_images = len(GT_ANN["images"])
@@ -109,6 +111,15 @@ def generate_bootstrap_curves(
             "bx-",
             label="mean",
         )
+
+        if test_ann is not None:
+            for t_ann in test_ann:
+                t_pr = transform_gt_into_pr(t_ann, gt_ann)
+                stats = froc_point(gt_ann, t_pr, .5, use_iou, iou_thres)
+                _lls_accuracy, _nlls_per_image = calc_scores(stats, {}, {})
+                plt.plot(_nlls_per_image[cat_id][0], _lls_accuracy[cat_id][0],
+                        '+', markersize=12, label=t_ann.split('/')[-3])
+
     plt.xlabel("FP/image")
     plt.ylabel("Sensitivity")
 

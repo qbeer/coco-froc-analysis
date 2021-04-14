@@ -8,24 +8,26 @@ def run(args):
         print("Generating bootstrap curves... (this may take a while)")
         generate_bootstrap_curves(
             gt_ann=args.gt_ann,
-            pr_ann=args.pred_ann,
+            pr_ann=args.pr_ann,
             n_bootstrap_samples=args.n_bootstrap_samples,
             use_iou=args.use_iou,
             iou_thres=args.iou_thres,
             n_sample_points=args.n_sample_points,
             plot_title=args.plot_title,
-            plot_output_path=args.plot_output_path
+            plot_output_path=args.plot_output_path,
+            test_ann=args.test_ann
         )
     else:
         print("Generating single FROC curve...")
         generate_froc_curve(
             gt_ann=args.gt_ann,
-            pr_ann=args.pred_ann,
+            pr_ann=args.pr_ann,
             use_iou=args.use_iou,
             iou_thres=args.iou_thres,
             n_sample_points=args.n_sample_points,
             plot_title=args.plot_title,
-            plot_output_path=args.plot_output_path
+            plot_output_path=args.plot_output_path,
+            test_ann=args.test_ann
         )
 
 
@@ -38,7 +40,7 @@ if __name__ == "__main__":
         help="Whether to do a single or bootstrap runs.",
     )
     parser.add_argument("--gt_ann", type=str, required=True)
-    parser.add_argument("--pred_ann", type=str, required=True)
+    parser.add_argument("--pr_ann", type=str, required=True)
     parser.add_argument(
         "--use_iou",
         default=False,
@@ -67,6 +69,8 @@ if __name__ == "__main__":
     )
     parser.add_argument("--plot_title", type=str, default='FROC')
     parser.add_argument("--plot_output_path", type=str, default='froc.png')
+
+    parser.add_argument('--test_ann', action='append', help='Extra ground-truth like annotations', required=False)
 
     args = parser.parse_args()
 
