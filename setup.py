@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="coco_froc_analysis",
-    version="0.0.25",
+    version="0.0.26",
     author="Alex Olar",
     author_email="olaralex666@gmail.com",
     description="A small package that evaluates COCO detection results from OpenMMLab and Detectron(2).",

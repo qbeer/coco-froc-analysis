@@ -85,6 +85,7 @@ def generate_froc_curve(
                     t_pr = transform_gt_into_pr(t_ann, gt_ann)
                     stats = froc_point(gt_ann, t_pr, .5, use_iou, iou_thres)
                     _lls_accuracy, _nlls_per_image = calc_scores(stats, {}, {})
+                    label = t_ann.split('/')[-1].replace('.json', '')
                     plt.plot(_nlls_per_image[category_id][0], _lls_accuracy[category_id][0],
                             '+', markersize=12, label=t_ann.split('/')[-3])
 
