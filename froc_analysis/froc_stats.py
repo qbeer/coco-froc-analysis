@@ -83,19 +83,18 @@ def update_stats(
                     pr_x, pr_y, pr_w, pr_h = pred_ann["bbox"]
                     pr_bbox_center = pr_x + pr_w / 2, pr_y + pr_h / 2
 
-                    if (
-                        pr_bbox_center[0] >= gt_x
-                        and pr_bbox_center[0] <= gt_x + gt_w
-                        and pr_bbox_center[1] >= gt_y
-                        and pr_bbox_center[1] <= gt_y + gt_h
-                    ):
+                    if (pr_bbox_center[0] >= gt_x
+                            and pr_bbox_center[0] <= gt_x + gt_w
+                            and pr_bbox_center[1] >= gt_y
+                            and pr_bbox_center[1] <= gt_y + gt_h):
                         stats[gt_ann["category_id"]]["LL"] += 1
                         n_is_ll[gt_ann["category_id"]] += 1
                         break
 
-        cat_to_n_pred = Counter(
-            [pr_ann["category_id"] for pr_ann in pr_id_to_annotation.get(image_id, [])]
-        )
+        cat_to_n_pred = Counter([
+            pr_ann["category_id"]
+            for pr_ann in pr_id_to_annotation.get(image_id, [])
+        ])
 
         difference = cat_to_n_pred - Counter(n_is_ll)
         for cat_id in difference:

@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+
 def transform_gt_into_pr(gt: str, true_gt: str) -> str:
     gt = load_json_from_file(gt)
     true_gt = load_json_from_file(true_gt)
@@ -35,6 +36,27 @@ def update_scores(json_data: list, score_thres: float) -> list:
     return preds
 
 
+def get_overlap(gt_box: list, pr_box: list) -> float:
+    """Intersection score between GT and prediction boxes.
+
+    Arguments:
+        gt_box {list} -- [x, y, w, h] of ground-truth lesion
+        pr_box {list} -- [x, y, w, h] of prediction bounding box
+
+    Returns:
+        intersection {float}
+    """
+    gt_x, gt_y, gt_w, gt_h = gt_box
+    pr_x, pr_y, pr_w, pr_h = pr_box
+
+    xA = max(gt_x, pr_x)
+    xB = min(gt_x + gt_w, pr_x + pr_w)
+    yA = max(gt_y, pr_y)
+    yB = min(gt_y + gt_h, pr_y + pr_h)
+
+    return float(max((xB - xA), 0) * max((yB - yA), 0))
+
+
 def get_iou_score(gt_box: list, pr_box: list) -> float:
     """IoU score between GT and prediction boxes.
 
@@ -45,17 +67,10 @@ def get_iou_score(gt_box: list, pr_box: list) -> float:
     Returns:
         score {float} -- intersection over union score of the two boxes
     """
-    gt_x, gt_y, gt_w, gt_h = gt_box
-    pr_x, pr_y, pr_w, pr_h = pr_box
+    *_, gt_w, gt_h = gt_box
+    *_, pr_w, pr_h = pr_box
 
-    xA = max(gt_x, pr_x)
-    xB = min(gt_x + gt_w, pr_x + pr_w)
-    yA = max(gt_y, pr_y)
-    yB = min(gt_y + gt_h, pr_y + pr_h)
-
-    intersection = max((xB - xA), 0) * max((yB - yA), 0)
-    if intersection == 0:
-        return 0.0
+    intersection = get_overlap(gt_box, pr_box)
 
     gt_area = gt_w * gt_h
     pr_area = pr_w * pr_h
