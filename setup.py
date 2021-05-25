@@ -5,10 +5,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="coco_froc_analysis",
-    version="0.0.27",
+    version="0.0.28",
     author="Alex Olar",
     author_email="olaralex666@gmail.com",
-    description="A small package that evaluates COCO detection results from OpenMMLab and Detectron(2).",
+    description=
+    "A small package that evaluates COCO detection results from OpenMMLab and Detectron(2).",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/qbeer/coco-froc-analysis",

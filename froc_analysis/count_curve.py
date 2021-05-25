@@ -33,8 +33,8 @@ def calc_scores(stats, precision, recall):
         fp = stats[category_id]['FP']
         fn = stats[category_id]['FN']
 
-        prec = tp / (tp + fp)
-        rec = tp / (tp + fn)
+        prec = tp / (tp + fp + 1e-7)
+        rec = tp / (tp + fn + 1e-7)
 
         if precision.get(category_id, None) is None:
             precision[category_id] = []
@@ -95,8 +95,8 @@ def generate_count_curve(gt_ann,
 
         plt.tight_layout()
 
-        plt.xlim(0, 1.01)
-        plt.ylim(0, 1.01)
+        plt.xlim(0.01, 1.01)
+        plt.ylim(0.01, 1.01)
 
         plt.savefig(plot_output_path, dpi=50)
     else:
