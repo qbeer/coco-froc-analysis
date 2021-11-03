@@ -76,36 +76,67 @@ def generate_bootstrap_curves(gt_ann,
                 collected_frocs["nlls"] = {cat_id: []}
 
         for cat_id in lls:
-            plt.semilogx(nlls[cat_id], lls[cat_id], "b--", alpha=0.15)
             collected_frocs["lls"][cat_id].append(lls[cat_id])
             collected_frocs["nlls"][cat_id].append(nlls[cat_id])
 
-    mean_froc_lls = {}
-    mean_froc_nlls = {}
+    interpolated_frocs = {}
+    max_froc_lls = {}
+    min_froc_lls = {}
 
     for cat_id in collected_frocs["lls"]:
-        mean_froc_lls[cat_id] = np.mean(
-            np.array(collected_frocs["lls"][cat_id]).reshape(
-                n_bootstrap_samples, n_sample_points),
+        all_lls = np.array(collected_frocs["lls"][cat_id]).reshape(
+            n_bootstrap_samples, n_sample_points)
+        all_nlls = np.array(collected_frocs["nlls"][cat_id]).reshape(
+            n_bootstrap_samples, n_sample_points)
+
+        min_nlls, max_nlls = np.min(all_nlls), np.max(all_nlls)
+
+        x_range = np.logspace(np.log10(min_nlls),
+                              np.log10(max_nlls),
+                              n_sample_points,
+                              endpoint=True)
+
+        frocs = []
+
+        for lls, nlls in zip(all_lls, all_nlls):
+            interpolated_lls = np.interp(x_range, nlls[::-1], lls[::-1])
+            frocs.append(interpolated_lls)
+
+        interpolated_frocs[cat_id] = {
+            "nlls": x_range,
+            "lls": np.array(frocs).reshape(n_bootstrap_samples,
+                                           n_sample_points)
+        }
+
+        max_froc_lls[cat_id] = np.max(
+            np.array(frocs).reshape(n_bootstrap_samples, n_sample_points),
             axis=0,
         )
-        mean_froc_nlls[cat_id] = np.mean(
-            np.array(collected_frocs["nlls"][cat_id]).reshape(
-                n_bootstrap_samples, n_sample_points),
+
+        min_froc_lls[cat_id] = np.min(
+            np.array(frocs).reshape(n_bootstrap_samples, n_sample_points),
             axis=0,
         )
 
     mean_froc_curve = {}
 
-    for cat_id in collected_frocs["lls"]:
+    for cat_id in interpolated_frocs:
         mean_froc_curve[cat_id] = np.stack(
-            (mean_froc_nlls[cat_id], mean_froc_lls[cat_id]), axis=-1)
+            (interpolated_frocs[cat_id]['nlls'],
+             np.mean(interpolated_frocs[cat_id]['lls'], axis=0)),
+            axis=-1)
+
         plt.semilogx(
             mean_froc_curve[cat_id][:, 0],
             mean_froc_curve[cat_id][:, 1],
-            "bx-",
+            "b-",
             label="mean",
         )
+
+        plt.fill_between(interpolated_frocs[cat_id]['nlls'],
+                         min_froc_lls[cat_id],
+                         max_froc_lls[cat_id],
+                         alpha=.2)
 
         if test_ann is not None:
             for t_ann in test_ann:

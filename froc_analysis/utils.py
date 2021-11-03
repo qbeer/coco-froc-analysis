@@ -14,7 +14,7 @@ def transform_gt_into_pr(gt: str, true_gt: str) -> str:
     scored_annotations = []
     for anno in annotations:
         anno['score'] = 1.0
-        anno['category_id'] = 1
+        anno['category_id'] = 0
         anno['image_id'] = id2trueId[anno['image_id']]
         scored_annotations.append(anno)
     with open('/tmp/pr2gt.json', 'w') as fp:
