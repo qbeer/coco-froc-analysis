@@ -10,15 +10,15 @@ from .froc_curve import generate_froc_curve, froc_point, calc_scores
 from .utils import transform_gt_into_pr
 
 
-def generate_bootstrap_curves(gt_ann,
-                              pr_ann,
-                              n_bootstrap_samples=5,
-                              use_iou=False,
-                              iou_thres=0.5,
-                              n_sample_points=50,
-                              plot_title="Bootstrap FROC",
-                              plot_output_path="froc_bootstrapped.png",
-                              test_ann=None):
+def generate_bootstrap_froc_curves(gt_ann,
+                                   pr_ann,
+                                   n_bootstrap_samples=5,
+                                   use_iou=False,
+                                   iou_thres=0.5,
+                                   n_sample_points=50,
+                                   plot_title="Bootstrap FROC",
+                                   plot_output_path="froc_bootstrapped.png",
+                                   test_ann=None):
     with open(gt_ann, "r") as fp:
         GT_ANN = json.load(fp)
 

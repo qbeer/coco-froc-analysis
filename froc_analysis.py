@@ -2,15 +2,28 @@ import argparse
 from froc_analysis import generate_froc_curve
 from froc_analysis import generate_bootstrap_curves
 from froc_analysis import generate_count_curve
+from froc_analysis.bootstrap_count_curve import generate_bootstrap_count_curves
 
 
 def run(args):
     if args.counts:
-        generate_count_curve(
-            gt_ann=args.gt_ann,
-            pr_ann=args.pr_ann,
-            weighted=args.weighted,
-        )
+        if args.bootstrap:
+            generate_bootstrap_count_curves(
+                gt_ann=args.gt_ann,
+                pr_ann=args.pr_ann,
+                n_bootstrap_samples=args.n_bootstrap_samples,
+                n_sample_points=args.n_sample_points,
+                plot_title=args.plot_title,
+                plot_output_path=args.plot_output_path,
+                weighted=args.weighted,
+                test_ann=args.test_ann)
+        else:
+            generate_count_curve(
+                gt_ann=args.gt_ann,
+                pr_ann=args.pr_ann,
+                weighted=args.weighted,
+            )
+
         exit(-1)
 
     if args.bootstrap:
@@ -85,7 +98,7 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
     )
-    
+
     parser.add_argument(
         '--weighted',
         default=False,

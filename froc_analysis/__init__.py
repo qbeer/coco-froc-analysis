@@ -1,3 +1,4 @@
-from .bootstrap_curve import generate_bootstrap_curves
+from .bootstrap_froc_curve import generate_bootstrap_froc_curves
+from .bootstrap_count_curve import generate_bootstrap_count_curves
 from .froc_curve import generate_froc_curve
 from .count_curve import generate_count_curve
