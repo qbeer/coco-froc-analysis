@@ -30,7 +30,7 @@ def load_json_from_file(file_path):
 
 def update_scores(json_data: list, score_thres: float) -> list:
     preds = []
-    for ind, pred in enumerate(json_data):
+    for _, pred in enumerate(json_data):
         if pred["score"] > score_thres:
             preds.append(pred)
     return preds
@@ -91,6 +91,10 @@ def build_pr_id2annotations(pr: list) -> dict:
     for annotation in pr:
         id_to_annotation[annotation["image_id"]] = []
     for annotation in pr:
+        # DO not add the exact same annotation twice in the bootstrap case
+        for ann in id_to_annotation[annotation["image_id"]]:
+            if ann == annotation:
+                continue
         id_to_annotation[annotation["image_id"]].append(annotation)
     return id_to_annotation
 
@@ -108,5 +112,9 @@ def build_gt_id2annotations(gt: dict) -> dict:
     for image in gt["images"]:
         id_to_annotation[image["id"]] = []
     for annotation in gt["annotations"]:
+        # DO not add the exact same annotation twice in the bootstrap case
+        for ann in id_to_annotation[annotation["image_id"]]:
+            if ann == annotation:
+                continue
         id_to_annotation[annotation["image_id"]].append(annotation)
     return id_to_annotation

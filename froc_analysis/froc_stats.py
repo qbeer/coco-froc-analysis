@@ -1,5 +1,7 @@
 from collections import Counter
+from scipy.optimize import linear_sum_assignment
 from .utils import get_iou_score
+import numpy as np
 
 
 def init_stats(gt: dict, categories: dict) -> dict:
@@ -62,42 +64,56 @@ def update_stats(
         stats {dict} -- Updated FROC statistics
     """
     for image_id in gt_id_to_annotation:
-        n_is_ll = dict()
+        cat2anns = {}
         for cat in categories:
-            n_is_ll[cat["id"]] = 0
+            cat2anns[cat['id']] = {"gt": [], "pr": []}
 
         for gt_ann in gt_id_to_annotation[image_id]:
-            for pred_ann in pr_id_to_annotation.get(image_id, []):
-                if gt_ann["category_id"] != pred_ann["category_id"]:
+            cat2anns[gt_ann["category_id"]]['gt'].append(gt_ann)
+        for pred_ann in pr_id_to_annotation.get(image_id, []):
+            cat2anns[pred_ann["category_id"]]['pr'].append(pred_ann)
+
+        for cat in categories:
+            gt_anns = cat2anns[cat['id']]['gt']
+            pr_anns = cat2anns[cat['id']]['pr']
+
+            n_gt = len(gt_anns)
+            n_pr = len(pr_anns)
+
+            if n_gt == 0:
+                if n_pr == 0:
                     continue
+                stats[cat['id']]['FP'] += n_pr
+            else:
+                cost_matrix = np.ones((n_gt, n_pr)) * 1e6
 
-                if use_iou:
-                    iou_score = get_iou_score(gt_ann["bbox"], pred_ann["bbox"])
-                    if iou_thres < iou_score:
-                        stats[gt_ann["category_id"]]["LL"] += 1
-                        n_is_ll[gt_ann["category_id"]] += 1
-                        break
-                else:
-                    gt_x, gt_y, gt_w, gt_h = gt_ann["bbox"]
+                for gt_ind, gt_ann in enumerate(gt_anns):
+                    for pr_ind, pr_ann in enumerate(pr_anns):
+                        if use_iou:
+                            iou_score = get_iou_score(gt_ann["bbox"],
+                                                      pr_ann["bbox"])
+                            if iou_score > iou_thres:
+                                cost_matrix[gt_ind, pr_ind] = iou_score / (
+                                    np.random.uniform(0, 1) / 1e6)
+                        else:
+                            gt_x, gt_y, gt_w, gt_h = gt_ann["bbox"]
 
-                    pr_x, pr_y, pr_w, pr_h = pred_ann["bbox"]
-                    pr_bbox_center = pr_x + pr_w / 2, pr_y + pr_h / 2
+                            pr_x, pr_y, pr_w, pr_h = pr_ann["bbox"]
+                            pr_bbox_center = pr_x + pr_w / 2, pr_y + pr_h / 2
 
-                    if (pr_bbox_center[0] >= gt_x
-                            and pr_bbox_center[0] <= gt_x + gt_w
-                            and pr_bbox_center[1] >= gt_y
-                            and pr_bbox_center[1] <= gt_y + gt_h):
-                        stats[gt_ann["category_id"]]["LL"] += 1
-                        n_is_ll[gt_ann["category_id"]] += 1
-                        break
+                            if (pr_bbox_center[0] >= gt_x
+                                    and pr_bbox_center[0] <= gt_x + gt_w
+                                    and pr_bbox_center[1] >= gt_y
+                                    and pr_bbox_center[1] <= gt_y + gt_h):
+                                cost_matrix[gt_ind, pr_ind] = 1.0
 
-        cat_to_n_pred = Counter([
-            pr_ann["category_id"]
-            for pr_ann in pr_id_to_annotation.get(image_id, [])
-        ])
+            row_ind, col_ind = linear_sum_assignment(
+                cost_matrix)  # Hungarian-matching
 
-        difference = cat_to_n_pred - Counter(n_is_ll)
-        for cat_id in difference:
-            stats[cat_id]["NL"] += difference[cat_id]
+            n_true_positives = len(row_ind)
+            n_false_positives = max(n_pr - len(col_ind), 0)
+
+            stats[cat['id']]['LL'] += n_true_positives
+            stats[cat['id']]['NL'] += n_false_positives
 
     return stats

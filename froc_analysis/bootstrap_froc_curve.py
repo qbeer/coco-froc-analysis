@@ -46,15 +46,34 @@ def generate_bootstrap_froc_curves(gt_ann,
         bootstrap_gt["annotations"] = []
         for _gt_ann_ in gt_annotations:
             img_id = _gt_ann_["image_id"]
-            for selected_image in selected_images:
+            for ind, selected_image in enumerate(selected_images):
                 if selected_image["id"] == img_id:
-                    bootstrap_gt["annotations"].append(_gt_ann_)
+                    new_gt_ann = deepcopy(_gt_ann_)
+                    new_gt_ann["image_id"] = ind
+                    bootstrap_gt["annotations"].append(new_gt_ann)
+
+        predictions = []
+
+        for ind, img in enumerate(selected_images):
+            for pr in PRED_ANN:
+                if pr["image_id"] == img["id"]:
+                    new_pr = deepcopy(pr)
+                    new_pr["image_id"] = ind
+                    predictions.append(new_pr)
+
+        re_indexed_images = []
+        for ind in range(len(selected_images)):
+            image = deepcopy(selected_images[ind])
+            image["id"] = ind
+            re_indexed_images.append(image)
+
+        bootstrap_gt["images"] = re_indexed_images
 
         with open("/tmp/tmp_bootstrap_gt.json", "w") as fp:
             json.dump(bootstrap_gt, fp)
 
         with open("/tmp/tmp_bootstrap_pred.json", "w") as fp:
-            json.dump(PRED_ANN, fp)
+            json.dump(predictions, fp)
 
         tmp_gt_ann = "/tmp/tmp_bootstrap_gt.json"
         tmp_pred_ann = "/tmp/tmp_bootstrap_pred.json"
@@ -89,12 +108,9 @@ def generate_bootstrap_froc_curves(gt_ann,
         all_nlls = np.array(collected_frocs["nlls"][cat_id]).reshape(
             n_bootstrap_samples, n_sample_points)
 
-        min_nlls, max_nlls = np.min(all_nlls), np.max(all_nlls)
+        _, max_nlls = np.min(all_nlls), np.max(all_nlls)
 
-        x_range = np.logspace(np.log10(min_nlls),
-                              np.log10(max_nlls),
-                              n_sample_points,
-                              endpoint=True)
+        x_range = np.linspace(1e-2, max_nlls, n_sample_points, endpoint=True)
 
         frocs = []
 
