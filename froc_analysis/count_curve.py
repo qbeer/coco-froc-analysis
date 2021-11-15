@@ -1,4 +1,3 @@
-from os import stat
 from .count_stats import init_stats, update_stats
 from .utils import (load_json_from_file, build_gt_id2annotations,
                     update_scores, build_pr_id2annotations,
