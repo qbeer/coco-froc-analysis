@@ -6,17 +6,18 @@ def transform_gt_into_pr(gt: str, true_gt: str) -> str:
     gt = load_json_from_file(gt)
     true_gt = load_json_from_file(true_gt)
     id2trueId = {}
-    for img in true_gt['images']:
+    for true_gt_img in true_gt['images']:
         for gt_img in gt['images']:
-            if img['path'].split('/')[-1] == gt_img['path'].split('/')[-1]:
-                id2trueId[gt_img['id']] = img['id']
+            if true_gt_img['path'].split('/')[-1] == gt_img['path'].split('/')[-1]:
+                id2trueId[gt_img['id']] = true_gt_img['id']
     annotations = gt['annotations']
     scored_annotations = []
     for anno in annotations:
-        anno['score'] = 1.0
-        anno['category_id'] = 0
-        anno['image_id'] = id2trueId[anno['image_id']]
-        scored_annotations.append(anno)
+        if id2trueId.get(anno['image_id']) is not None:
+            anno['image_id'] = id2trueId[anno['image_id']]
+            anno['score'] = 1.0
+            anno['category_id'] = 0
+            scored_annotations.append(anno)
     with open('/tmp/pr2gt.json', 'w') as fp:
         json.dump(scored_annotations, fp)
     return '/tmp/pr2gt.json'
