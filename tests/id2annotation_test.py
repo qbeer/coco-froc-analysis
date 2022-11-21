@@ -1,28 +1,31 @@
+from __future__ import annotations
+
 import unittest
 
-from froc_analysis.utils import build_pr_id2annotations, build_gt_id2annotations
+from froc_analysis.utils import build_gt_id2annotations
+from froc_analysis.utils import build_pr_id2annotations
 
 
 class TestId2Annotation(unittest.TestCase):
     def setUp(self):
         self.gt = {
-            "images": [{"id": 1}, {"id": 2}],
-            "annotations": [
-                {"image_id": 1},
-                {"image_id": 1},
-                {"image_id": 1},
-                {"image_id": 2},
+            'images': [{'id': 1}, {'id': 2}],
+            'annotations': [
+                {'image_id': 1},
+                {'image_id': 1},
+                {'image_id': 1},
+                {'image_id': 2},
             ],
         }
         self.pr = [
-            {"image_id": 1},
-            {"image_id": 1},
-            {"image_id": 1},
-            {"image_id": 1},
-            {"image_id": 1},
-            {"image_id": 2},
-            {"image_id": 2},
-            {"image_id": 2},
+            {'image_id': 1},
+            {'image_id': 1},
+            {'image_id': 1},
+            {'image_id': 1},
+            {'image_id': 1},
+            {'image_id': 2},
+            {'image_id': 2},
+            {'image_id': 2},
         ]
 
     def test_build_ground_truth_id2annotations_dict(self):

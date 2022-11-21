@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import unittest
+
 from froc_analysis.utils import get_iou_score
 
 
