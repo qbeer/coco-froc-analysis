@@ -1,10 +1,16 @@
-from .count_stats import init_stats, update_stats
-from .utils import (load_json_from_file, build_gt_id2annotations,
-                    update_scores, build_pr_id2annotations,
-                    transform_gt_into_pr)
+from __future__ import annotations
+
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
+
+from ..utils import build_gt_id2annotations
+from ..utils import build_pr_id2annotations
+from ..utils import load_json_from_file
+from ..utils import transform_gt_into_pr
+from ..utils import update_scores
+from .count_stats import init_stats
+from .count_stats import update_stats
 
 
 def count_point(gt_ann, pr_ann, score_thres, weighted):
@@ -13,15 +19,17 @@ def count_point(gt_ann, pr_ann, score_thres, weighted):
 
     pr = update_scores(pr, score_thres)
 
-    categories = gt["categories"]
+    categories = gt['categories']
 
     stats = init_stats(gt, categories)
 
     gt_id_to_annotation = build_gt_id2annotations(gt)
     pr_id_to_annotation = build_pr_id2annotations(pr)
 
-    stats = update_stats(stats, gt_id_to_annotation, pr_id_to_annotation,
-                         categories, weighted)
+    stats = update_stats(
+        stats, gt_id_to_annotation, pr_id_to_annotation,
+        categories, weighted,
+    )
 
     return stats
 
@@ -46,18 +54,21 @@ def calc_scores(stats, precision, recall):
     return precision, recall
 
 
-def generate_count_curve(gt_ann,
-                         pr_ann,
-                         weighted=False,
-                         n_sample_points=50,
-                         plot_title="Count curve",
-                         plot_output_path="counts.png",
-                         test_ann=None):
+def generate_count_curve(
+    gt_ann,
+    pr_ann,
+    weighted=False,
+    n_sample_points=50,
+    plot_title='Count curve',
+    plot_output_path='counts.png',
+    test_ann=None,
+):
     precision = {}
     recall = {}
 
     for score_thres in tqdm(
-            np.linspace(0.0, 1.0, n_sample_points, endpoint=False)):
+            np.linspace(0.0, 1.0, n_sample_points, endpoint=False),
+    ):
         stats = count_point(gt_ann, pr_ann, score_thres, weighted)
         precision, recall = calc_scores(stats, precision, recall)
 
@@ -68,10 +79,12 @@ def generate_count_curve(gt_ann,
         prec = precision[category_id]
         rec = recall[category_id]
         if plot_title:
-            plt.plot(prec,
-                     rec,
-                     "x--",
-                     label='AI ' + stats[category_id]["name"])
+            plt.plot(
+                prec,
+                rec,
+                'x--',
+                label='AI ' + stats[category_id]['name'],
+            )
 
             if test_ann is not None:
                 for t_ann in test_ann:
@@ -79,18 +92,20 @@ def generate_count_curve(gt_ann,
                     stats = count_point(gt_ann, t_pr, .5, weighted)
                     _precision, _recall = calc_scores(stats, {}, {})
                     label = t_ann.split('/')[-1].replace('.json', '')
-                    plt.plot(_precision[category_id][0],
-                             _recall[category_id][0],
-                             '+',
-                             markersize=12,
-                             label=label)
+                    plt.plot(
+                        _precision[category_id][0],
+                        _recall[category_id][0],
+                        '+',
+                        markersize=12,
+                        label=label,
+                    )
 
     if plot_title:
-        plt.legend(loc="lower right")
+        plt.legend(loc='lower right')
 
         plt.title(plot_title)
-        plt.ylabel("Precision")
-        plt.xlabel("Recall")
+        plt.ylabel('Precision')
+        plt.xlabel('Recall')
 
         plt.tight_layout()
 

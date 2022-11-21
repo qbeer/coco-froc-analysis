@@ -17,6 +17,8 @@ scipy = "^1.9.3"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"
+mock = "^4.0.3"
+typer-cli = "^0.0.12"
 
 [build-system]
 requires = ["poetry-core"]
