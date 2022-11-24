@@ -11,6 +11,7 @@ from tqdm.auto import tqdm
 
 from ..utils import transform_gt_into_pr
 from .froc_curve import calc_scores
+from .froc_curve import colors
 from .froc_curve import froc_point
 from .froc_curve import generate_froc_curve
 
@@ -34,12 +35,27 @@ def generate_bootstrap_froc_curves(
 
     n_images = len(GT_ANN['images'])
 
-    plt.figure(figsize=(15, 15))
+    fig, ax = plt.subplots(figsize=[20, 9])
+    ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
+    ins.set_xlim([0.1, 5.0])
+    ins.set_xticks([0.1, 1.0, 2.0, 3.0, 4.0])
 
     collected_frocs = {'lls': {}, 'nlls': {}}
 
+    non_bootstrap_lls, non_bootstrap_nlls = generate_froc_curve(
+        gt_ann,
+        pr_ann,
+        use_iou,
+        iou_thres,
+        n_sample_points,
+        plot_title=None,
+        plot_output_path=None,
+    )
+
     for _ in tqdm(range(n_bootstrap_samples)):
-        selected_images = random.choices(GT_ANN['images'], k=n_images)
+        selected_images = random.choices(
+            GT_ANN['images'], k=n_images,
+        )  # sample with replacement
         bootstrap_gt = deepcopy(GT_ANN)
 
         del bootstrap_gt['images']
@@ -117,9 +133,14 @@ def generate_bootstrap_froc_curves(
             n_bootstrap_samples, n_sample_points,
         )
 
-        _, max_nlls = np.min(all_nlls), np.max(all_nlls)
+        min_nlls, max_nlls = np.min(non_bootstrap_nlls[cat_id]), np.max(
+            non_bootstrap_nlls[cat_id],
+        )
 
-        x_range = np.linspace(1e-2, max_nlls, n_sample_points, endpoint=True)
+        x_range = np.linspace(
+            min_nlls, max_nlls,
+            n_sample_points, endpoint=True,
+        )
 
         frocs = []
 
@@ -156,42 +177,110 @@ def generate_bootstrap_froc_curves(
             axis=-1,
         )
 
-        plt.semilogx(
+        ax.semilogx(
             mean_froc_curve[cat_id][:, 0],
             mean_froc_curve[cat_id][:, 1],
             'b-',
             label='mean',
         )
 
-        plt.fill_between(
+        ins.semilogx(
+            mean_froc_curve[cat_id][:, 0],
+            mean_froc_curve[cat_id][:, 1],
+            'b-',
+            label='mean',
+        )
+
+        ax.fill_between(
             interpolated_frocs[cat_id]['nlls'],
             min_froc_lls[cat_id],
             max_froc_lls[cat_id],
             alpha=.2,
         )
 
+        ins.fill_between(
+            interpolated_frocs[cat_id]['nlls'],
+            min_froc_lls[cat_id],
+            max_froc_lls[cat_id],
+            alpha=.2,
+        )
+
+        for lls, nlls in zip(all_lls, all_nlls):
+            ax.semilogx(nlls, lls, 'r-', alpha=.1)
+            ins.semilogx(nlls, lls, 'r-', alpha=.1)
+
         if test_ann is not None:
-            for t_ann in test_ann:
+            for t_ann, c in zip(test_ann, colors):
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
                 stats = froc_point(gt_ann, t_pr, .5, use_iou, iou_thres)
                 _lls_accuracy, _nlls_per_image = calc_scores(stats, {}, {})
                 label = t_ann.split('/')[-1].replace('.json', '')
-                plt.plot(
+                if 'bobe' in label:
+                    label = 'bobe'
+                elif 'istvan' in label:
+                    label = 'istvan'
+                elif 'tea' in label:
+                    label = 'tea'
+                ax.plot(
                     _nlls_per_image[cat_id][0],
                     _lls_accuracy[cat_id][0],
-                    '+',
+                    'D',
+                    markersize=15,
+                    markeredgewidth=3,
+                    label=label +
+                    f' (FP/image = {_nlls_per_image[cat_id][0]})',
+                    c=c,
+                )
+                ins.semilogx(
+                    _nlls_per_image[cat_id][0],
+                    _lls_accuracy[cat_id][0],
+                    'D',
                     markersize=12,
-                    label=label,
+                    markeredgewidth=2,
+                    label=label +
+                    f' (FP/image = {_nlls_per_image[cat_id][0]})',
+                    c=c,
+                )
+                ax.hlines(
+                    y=_lls_accuracy[cat_id][0],
+                    xmin=min_nlls,
+                    xmax=max_nlls,
+                    linestyles='dashed',
+                    colors=c,
+                )
+                ins.hlines(
+                    y=_lls_accuracy[cat_id][0],
+                    xmin=min_nlls,
+                    xmax=max_nlls,
+                    linestyles='dashed',
+                    colors=c,
+                )
+                ax.text(
+                    x=min_nlls, y=_lls_accuracy[cat_id][0] + 0.01,
+                    s=f' FP/image = {_nlls_per_image[cat_id][0]}',
+                    fontdict={'fontsize': 20, 'fontweight': 'bold'},
                 )
 
-    plt.xlabel('FP/image')
-    plt.ylabel('Sensitivity')
+        ax.semilogx(
+            non_bootstrap_nlls[cat_id], non_bootstrap_lls[cat_id], 'r--', label='non-bootstrap',
+        )
+        ins.semilogx(
+            non_bootstrap_nlls[cat_id], non_bootstrap_lls[cat_id], 'r--', label='non-bootstrap',
+        )
 
-    plt.legend(loc='upper left')
+    ax.legend(loc='upper right', fontsize=25)
+
+    ax.set_title(plot_title, fontdict={'fontsize': 35})
+    ax.set_ylabel('Sensitivity', fontdict={'fontsize': 30})
+    ax.set_xlabel('FP / image', fontdict={'fontsize': 30})
+
+    ax.tick_params(axis='both', which='major', labelsize=30)
+    ins.tick_params(axis='both', which='major', labelsize=20)
+
+    ax.set_ylim(top=1.02)
+    ax.set_xlim(min_nlls, max_nlls)
+    fig.tight_layout()
+    fig.savefig(fname=plot_output_path, dpi=150)
 
     os.remove('/tmp/tmp_bootstrap_gt.json')
     os.remove('/tmp/tmp_bootstrap_pred.json')
-
-    plt.title(plot_title)
-
-    plt.savefig(plot_output_path, dpi=100)

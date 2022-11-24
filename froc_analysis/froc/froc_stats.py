@@ -114,14 +114,14 @@ def update_stats(
                             ):
                                 cost_matrix[gt_ind, pr_ind] = 1.0
 
-            row_ind, col_ind = linear_sum_assignment(
-                cost_matrix,
-            )  # Hungarian-matching
+                row_ind, col_ind = linear_sum_assignment(
+                    cost_matrix,
+                )  # Hungarian-matching
 
-            n_true_positives = len(row_ind)
-            n_false_positives = max(n_pr - len(col_ind), 0)
+                n_true_positives = len(row_ind)
+                n_false_positives = max(n_pr - len(col_ind), 0)
 
-            stats[cat['id']]['LL'] += n_true_positives
-            stats[cat['id']]['NL'] += n_false_positives
+                stats[cat['id']]['LL'] += n_true_positives
+                stats[cat['id']]['NL'] += n_false_positives
 
     return stats

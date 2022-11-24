@@ -73,7 +73,7 @@ def generate_count_curve(
         precision, recall = calc_scores(stats, precision, recall)
 
     if plot_title:
-        plt.figure(figsize=(12, 12))
+        plt.figure(figsize=(15, 15))
 
     for category_id in precision:
         prec = precision[category_id]
@@ -84,6 +84,7 @@ def generate_count_curve(
                 rec,
                 'x--',
                 label='AI ' + stats[category_id]['name'],
+                fontsize=32,
             )
 
             if test_ann is not None:
@@ -98,20 +99,25 @@ def generate_count_curve(
                         '+',
                         markersize=12,
                         label=label,
+                        fontsize=32,
                     )
 
     if plot_title:
         plt.legend(loc='lower right')
 
-        plt.title(plot_title)
-        plt.ylabel('Precision')
-        plt.xlabel('Recall')
+        plt.title(plot_title, fontdict={'fontsize': 40})
+        plt.ylabel(
+            'Precision', fontdict={
+                'fontsize': 32, 'fontweight': 'bold',
+            },
+        )
+        plt.xlabel('Recall', fontdict={'fontsize': 32, 'fontweight': 'bold'})
 
         plt.tight_layout()
 
         plt.xlim(0.01, 1.01)
         plt.ylim(0.01, 1.01)
 
-        plt.savefig(plot_output_path, dpi=50)
+        plt.savefig(plot_output_path, dpi=150)
     else:
         return precision, recall

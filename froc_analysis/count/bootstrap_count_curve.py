@@ -157,6 +157,7 @@ def generate_bootstrap_count_curves(
             mean_roc_curve[cat_id][:, 1],
             'b-',
             label='mean',
+            fontsize=32,
         )
 
         plt.fill_between(
@@ -178,13 +179,14 @@ def generate_bootstrap_count_curves(
                     '+',
                     markersize=12,
                     label=label,
+                    fontsize=32,
                 )
 
-    plt.legend(loc='lower right')
+    plt.legend(loc='upper left')
 
-    plt.title(plot_title)
-    plt.ylabel('Precision')
-    plt.xlabel('Recall')
+    plt.title(plot_title, fontdict={'fontsize': 40})
+    plt.ylabel('Precision', fontdict={'fontsize': 32, 'fontweight': 'bold'})
+    plt.xlabel('Recall', fontdict={'fontsize': 32, 'fontweight': 'bold'})
 
     plt.tight_layout()
 
@@ -194,4 +196,4 @@ def generate_bootstrap_count_curves(
     os.remove('/tmp/tmp_bootstrap_gt.json')
     os.remove('/tmp/tmp_bootstrap_pred.json')
 
-    plt.savefig(plot_output_path, dpi=100)
+    plt.savefig(plot_output_path, dpi=150)

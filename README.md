@@ -65,12 +65,12 @@ generate_bootstrap_curves(gt_ann='<path-to-your-ground-thruth-annotation-file>',
 ## CLI Usage
 
 ```bash
-usage: froc_analysis.py [-h] [--bootstrap] --gt_ann GT_ANN --pred_ann PRED_ANN [--use_iou] [--iou_thres IOU_THRES] [--n_sample_points N_SAMPLE_POINTS] [--n_bootstrap_samples N_BOOTSTRAP_SAMPLES]
+usage: froc_analysis.py [-h] [--bootstrap N_BOOTSTRAP_ROUNDS] --gt_ann GT_ANN --pred_ann PRED_ANN [--use_iou] [--iou_thres IOU_THRES] [--n_sample_points N_SAMPLE_POINTS]
                         [--plot_title PLOT_TITLE] [--plot_output_path PLOT_OUTPUT_PATH]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --bootstrap           Whether to do a single or bootstrap runs.
+  --bootstrap  N_ROUNDS Whether to do a single or bootstrap runs.
   --gt_ann GT_ANN
   --pred_ann PRED_ANN
   --use_iou             Use IoU score to decide on `proximity` rather then using center pixel inside GT box.
@@ -78,8 +78,6 @@ optional arguments:
                         If IoU score is used the default threshold is arbitrarily set to .5
   --n_sample_points N_SAMPLE_POINTS
                         Number of points to evaluate the FROC curve at.
-  --n_bootstrap_samples N_BOOTSTRAP_SAMPLES
-                        Number of bootstrap samples.
   --plot_title PLOT_TITLE
   --plot_output_path PLOT_OUTPUT_PATH
 ```

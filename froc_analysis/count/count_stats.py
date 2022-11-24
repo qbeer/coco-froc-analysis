@@ -80,17 +80,17 @@ def update_stats(
                                     pr_ind,
                                 ] = 1.0  # connected, not weighted
 
-            row_ind, col_ind = linear_sum_assignment(
-                cost_matrix,
-            )  # Hungarian-matching
+                row_ind, col_ind = linear_sum_assignment(
+                    cost_matrix,
+                )  # Hungarian-matching
 
-            n_true_positives = len(row_ind)
-            n_false_positives = max(n_pr - len(col_ind), 0)
-            n_false_negatives = max(n_gt - len(row_ind), 0)
+                n_true_positives = len(row_ind)
+                n_false_positives = max(n_pr - len(col_ind), 0)
+                n_false_negatives = max(n_gt - len(row_ind), 0)
 
-            stats[cat['id']]['P'] += n_gt
-            stats[cat['id']]['TP'] += n_true_positives
-            stats[cat['id']]['FP'] += n_false_positives
-            stats[cat['id']]['FN'] += n_false_negatives
+                stats[cat['id']]['P'] += n_gt
+                stats[cat['id']]['TP'] += n_true_positives
+                stats[cat['id']]['FP'] += n_false_positives
+                stats[cat['id']]['FN'] += n_false_negatives
 
     return stats

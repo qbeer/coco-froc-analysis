@@ -10,14 +10,16 @@ from froc_analysis.froc import generate_froc_curve
 
 def run(args):
     if args.counts:
-        if args.bootstrap:
+        if args.bootstrap > 1:
             generate_bootstrap_count_curves(
                 gt_ann=args.gt_ann,
                 pr_ann=args.pr_ann,
-                n_bootstrap_samples=args.n_bootstrap_samples,
+                n_bootstrap_samples=args.bootstrap,
                 n_sample_points=args.n_sample_points,
-                plot_title=args.plot_title,
-                plot_output_path=args.plot_output_path,
+                plot_title=args.plot_title + ' (bootstrap)',
+                plot_output_path=args.plot_output_path.replace(
+                    '.png', '_bootstrap.png',
+                ),
                 weighted=args.weighted,
                 test_ann=args.test_ann,
             )
@@ -30,17 +32,19 @@ def run(args):
 
         exit(-1)
 
-    if args.bootstrap:
+    if args.bootstrap > 1:
         print('Generating bootstrap curves... (this may take a while)')
         generate_bootstrap_froc_curves(
             gt_ann=args.gt_ann,
             pr_ann=args.pr_ann,
-            n_bootstrap_samples=args.n_bootstrap_samples,
+            n_bootstrap_samples=args.bootstrap,
             use_iou=args.use_iou,
             iou_thres=args.iou_thres,
             n_sample_points=args.n_sample_points,
-            plot_title=args.plot_title,
-            plot_output_path=args.plot_output_path,
+            plot_title=args.plot_title + ' (bootstrap)',
+            plot_output_path=args.plot_output_path.replace(
+                '.png', '_bootstrap.png',
+            ),
             test_ann=args.test_ann,
         )
     else:
@@ -61,8 +65,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--bootstrap',
-        action='store_true',
-        default=False,
+        type=int,
+        default=1,
         help='Whether to do a single or bootstrap runs.',
     )
     parser.add_argument('--gt_ann', type=str, required=True)
@@ -85,13 +89,6 @@ if __name__ == '__main__':
         type=int,
         default=50,
         help='Number of points to evaluate the FROC curve at.',
-    )
-    parser.add_argument(
-        '--n_bootstrap_samples',
-        default=25,
-        type=int,
-        required=False,
-        help='Number of bootstrap samples.',
     )
     parser.add_argument('--plot_title', type=str, default='FROC')
     parser.add_argument('--plot_output_path', type=str, default='froc.png')

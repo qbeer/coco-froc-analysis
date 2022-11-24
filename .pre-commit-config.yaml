@@ -40,7 +40,7 @@ repos:
         args: # arguments to configure flake8
             # making isort line length compatible with black
             - "--max-line-length=130"
-            - "--max-complexity=18"
+            - "--max-complexity=22"
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.990
     hooks:

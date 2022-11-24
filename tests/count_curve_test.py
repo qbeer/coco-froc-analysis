@@ -13,10 +13,10 @@ class TestFrocCurve(unittest.TestCase):
         self.pr_prefect = (
             f'{os.getcwd()}/tests/example_coco_data/perfect_predictions.json'
         )
-        self.pr_single_error_per_image_high_conf = f'{os.getcwd()}/tests/example_coco_data/\
-            single_error_per_image_predictions.json'
-        self.pr_single_error_per_image_low_conf = f'{os.getcwd()}/tests/example_coco_data/\
-            single_error_per_image_low_confidence_predictions.json'
+        self.pr_single_error_per_image_high_conf =\
+            f'{os.getcwd()}/tests/example_coco_data/single_error_per_image_predictions.json'
+        self.pr_single_error_per_image_low_conf =\
+            f'{os.getcwd()}/tests/example_coco_data/single_error_per_image_low_confidence_predictions.json'
         warnings.simplefilter('ignore', category=UserWarning)
 
     def test_high_conf_single_error_predictions_for_all_score_thresholds(self):
