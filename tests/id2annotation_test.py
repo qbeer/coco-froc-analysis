@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from froc_analysis.utils import build_gt_id2annotations
-from froc_analysis.utils import build_pr_id2annotations
+from coco_froc_analysis.utils import build_gt_id2annotations
+from coco_froc_analysis.utils import build_pr_id2annotations
 
 
 class TestId2Annotation(unittest.TestCase):

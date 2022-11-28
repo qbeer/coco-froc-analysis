@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from froc_analysis.utils import get_iou_score
+from coco_froc_analysis.utils import get_iou_score
 
 
 class TestIoU(unittest.TestCase):

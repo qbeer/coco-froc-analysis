@@ -5,8 +5,8 @@ import unittest
 import warnings
 from unittest import mock
 
-from froc_analysis.froc import froc_point
-from froc_analysis.froc import generate_froc_curve
+from coco_froc_analysis.froc import froc_point
+from coco_froc_analysis.froc import generate_froc_curve
 
 # remove tqdm logging while testing
 

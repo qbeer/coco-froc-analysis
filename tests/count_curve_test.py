@@ -4,7 +4,7 @@ import os
 import unittest
 import warnings
 
-from froc_analysis.count import count_point
+from coco_froc_analysis.count import count_point
 
 
 class TestFrocCurve(unittest.TestCase):

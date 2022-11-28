@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import argparse
 
-from froc_analysis.count import generate_bootstrap_count_curves
-from froc_analysis.count import generate_count_curve
-from froc_analysis.froc import generate_bootstrap_froc_curves
-from froc_analysis.froc import generate_froc_curve
+from coco_froc_analysis.count import generate_bootstrap_count_curves
+from coco_froc_analysis.count import generate_count_curve
+from coco_froc_analysis.froc import generate_bootstrap_froc_curves
+from coco_froc_analysis.froc import generate_froc_curve
 
 
 def run(args):

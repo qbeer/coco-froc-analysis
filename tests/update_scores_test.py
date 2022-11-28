@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from froc_analysis.utils import update_scores
+from coco_froc_analysis.utils import update_scores
 
 
 class TestUpdateScore(unittest.TestCase):
