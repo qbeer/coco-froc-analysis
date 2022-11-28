@@ -7,7 +7,6 @@ with open('README.md', encoding='utf-8') as fh:
 
 setuptools.setup(
     name='coco_froc_analysis',
-    version='0.0.31',
     author='Alex Olar',
     author_email='olaralex666@gmail.com',
     description='A small package that evaluates COCO detection results from OpenMMLab and Detectron(2).',
@@ -22,5 +21,5 @@ setuptools.setup(
         'License :: OSI Approved :: MIT License',
     ],
     packages=setuptools.find_packages(),
-    python_requires='>=3.6',
+    python_requires='>=3.8',
 )
