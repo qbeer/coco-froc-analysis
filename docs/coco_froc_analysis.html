@@ -21,6 +21,17 @@
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                    pattern=".+" required>
 
+        <h2>Contents</h2>
+        <ul>
+  <li><a href="#coco-froc-analysis">COCO FROC analysis</a>
+  <ul>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#cli-usage">CLI Usage</a></li>
+    <li><a href="#running-tests">Running tests</a></li>
+    <li><a href="#regards-alex">@Regards, Alex</a></li>
+  </ul></li>
+</ul>
+
 
         <h2>Submodules</h2>
         <ul>
@@ -42,13 +53,117 @@
                     <h1 class="modulename">
 coco_froc_analysis    </h1>
 
+                        <div class="docstring"><h1 id="coco-froc-analysis">COCO FROC analysis</h1>
+
+<p>FROC analysis for COCO annotations and Detectron(2) detection results. The COCO annotation style is defined <a href="https://cocodataset.org/">here</a>.</p>
+
+<h3 id="installation">Installation</h3>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>pip install coco-froc-analysis
+</code></pre>
+</div>
+
+<h3 id="about">About</h3>
+
+<p>A single annotation record in the ground-truth file might look like this:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;area&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2120</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;iscrowd&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">111</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">53</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">],</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;category_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;ignore&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;segmentation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;image_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">407</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">945</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+
+<p>While the prediction (here for bounding box) given by the region detection framework is such:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;image_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">407</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;category_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.9990422129631042</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="mf">110.72555541992188</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mf">13.9161834716797</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mf">49.4566650390625</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mf">36.65155029296875</span><span class="w"></span>
+<span class="w">  </span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+
+<p>The FROC analysis counts the number of images, number of lesions in the ground truth file for all categories and then counts the lesion localization predictions and the non-lesion localization predictions. A lesion is localized by default if its center is inside any ground truth box and the categories match or if you wish to use IoU you should provide threshold upon which you can define the 'close enough' relation.</p>
+
+<h2 id="usage">Usage</h2>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn">froc_analysis</span> <span class="kn">import</span> <span class="n">generate_froc_curve</span><span class="p">,</span> <span class="n">generate_bootstrap_curves</span>
+
+<span class="c1"># For single FROC curve</span>
+<span class="n">generate_froc_curve</span><span class="p">(</span><span class="n">gt_ann</span><span class="o">=</span><span class="s1">&#39;&lt;path-to-your-ground-thruth-annotation-file&gt;&#39;</span><span class="p">,</span>
+                    <span class="n">pr_ann</span><span class="o">=</span><span class="s1">&#39;&lt;path-to-Detectron2-or-mmdetection-prediction-file&gt;&#39;</span><span class="p">,</span>
+                    <span class="n">use_iou</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">iou_thres</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">n_sample_points</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span>
+                    <span class="n">plot_title</span><span class="o">=</span><span class="s1">&#39;FROC&#39;</span><span class="p">,</span> <span class="n">plot_output_path</span><span class="o">=</span><span class="s1">&#39;froc.png&#39;</span><span class="p">)</span>
+
+<span class="c1"># For bootstrapped curves</span>
+<span class="n">generate_bootstrap_curves</span><span class="p">(</span><span class="n">gt_ann</span><span class="o">=</span><span class="s1">&#39;&lt;path-to-your-ground-thruth-annotation-file&gt;&#39;</span><span class="p">,</span>
+                          <span class="n">pr_ann</span><span class="o">=</span><span class="s1">&#39;&lt;path-to-Detectron2-or-mmdetection-prediction-file&gt;&#39;</span><span class="p">,</span>
+                          <span class="n">n_bootstrap_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                          <span class="n">use_iou</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">iou_thres</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">n_sample_points</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                          <span class="n">plot_title</span><span class="o">=</span><span class="s1">&#39;FROC&#39;</span><span class="p">,</span> <span class="n">plot_output_path</span><span class="o">=</span><span class="s1">&#39;froc.png&#39;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h2 id="cli-usage">CLI Usage</h2>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>python -m coco_froc_analysis <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>--bootstrap N_BOOTSTRAP_ROUNDS<span class="o">]</span> --gt_ann GT_ANN --pred_ann PRED_ANN <span class="o">[</span>--use_iou<span class="o">]</span> <span class="o">[</span>--iou_thres IOU_THRES<span class="o">]</span> <span class="o">[</span>--n_sample_points N_SAMPLE_POINTS<span class="o">]</span>
+                        <span class="o">[</span>--plot_title PLOT_TITLE<span class="o">]</span> <span class="o">[</span>--plot_output_path PLOT_OUTPUT_PATH<span class="o">]</span>
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --bootstrap  N_ROUNDS Whether to <span class="k">do</span> a single or bootstrap runs.
+  --gt_ann GT_ANN
+  --pred_ann PRED_ANN
+  --use_iou             Use IoU score to decide on <span class="sb">`</span>proximity<span class="sb">`</span> rather <span class="k">then</span> using center pixel inside GT box.
+  --iou_thres IOU_THRES
+                        If IoU score is used the default threshold is arbitrarily <span class="nb">set</span> to .5
+  --n_sample_points N_SAMPLE_POINTS
+                        Number of points to evaluate the FROC curve at.
+  --plot_title PLOT_TITLE
+  --plot_output_path PLOT_OUTPUT_PATH
+</code></pre>
+</div>
+
+<p>By default centroid closeness is used, if the <code>--use_iou</code> flag is set, <code>--iou_thres</code> defaults to <code>.75</code> while the <code>--score_thres</code> score defaults to <code>.5</code>. The code outputs the FROC curve on the given detection results and GT dataset.</p>
+
+<h2 id="running-tests">Running tests</h2>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>python -m coverage run -m unittest discover --pattern <span class="s2">&quot;*_test.py&quot;</span> -v
+python -m coverage report -m
+</code></pre>
+</div>
+
+<h2 id="regards-alex">@Regards, Alex</h2>
+</div>
 
                         <input id="mod-coco_froc_analysis-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-coco_froc_analysis-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;froc&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">]</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="sd">.. include:: ../README.md</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">3</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">4</span></a><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">5</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;froc&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">]</span>
 </span></pre></div>
 
 
