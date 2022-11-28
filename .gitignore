@@ -1,6 +1,7 @@
 .vscode/
 coco-froc
 coco
+dist/*
 
 data/*.json
 
