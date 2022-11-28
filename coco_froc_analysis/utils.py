@@ -3,6 +3,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+colors = [
+    'r', 'g', 'm', 'y', 'teal', 'magenta',
+    'royalblue', 'lime', 'forestgreen',
+]
+
 
 def transform_gt_into_pr(
     gt: dict[str, list],

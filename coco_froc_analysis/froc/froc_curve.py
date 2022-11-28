@@ -6,16 +6,12 @@ from tqdm.auto import tqdm
 
 from ..utils import build_gt_id2annotations
 from ..utils import build_pr_id2annotations
+from ..utils import colors
 from ..utils import load_json_from_file
 from ..utils import transform_gt_into_pr
 from ..utils import update_scores
 from .froc_stats import init_stats
 from .froc_stats import update_stats
-
-colors = [
-    'r', 'g', 'm', 'y', 'teal', 'magenta',
-    'royalblue', 'lime', 'forestgreen',
-]
 
 
 def froc_point(gt_ann, pr_ann, score_thres, use_iou, iou_thres):

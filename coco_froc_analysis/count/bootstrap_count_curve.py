@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
 
+from ..utils import colors
 from ..utils import transform_gt_into_pr
 from .count_curve import calc_scores
 from .count_curve import count_point
@@ -33,9 +34,22 @@ def generate_bootstrap_count_curves(
 
     n_images = len(GT_ANN['images'])
 
-    plt.figure(figsize=(15, 15))
+    fig, ax = plt.subplots(figsize=[20, 9])
+    ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
+    ins.set_xlim([0.8, 1.0])
+    ins.set_xticks([.85, .9, .95, 1.], fontsize=30)
+    ins.set_ylim(bottom=0.2)
 
     collected_rocs = {'precision': {}, 'recall': {}}
+
+    _, non_bootstrap_rec = generate_count_curve(
+        gt_ann,
+        pr_ann,
+        weighted=weighted,
+        n_sample_points=n_sample_points,
+        plot_title=None,
+        plot_output_path=None,
+    )
 
     for _ in tqdm(range(n_bootstrap_samples)):
         selected_images = random.choices(GT_ANN['images'], k=n_images)
@@ -115,7 +129,11 @@ def generate_bootstrap_count_curves(
             n_bootstrap_samples, n_sample_points,
         )
 
-        x_range = np.linspace(1e-2, .99, n_sample_points, endpoint=True)
+        min_rec, max_rec = np.min(non_bootstrap_rec[cat_id]), np.max(
+            non_bootstrap_rec[cat_id],
+        )
+
+        x_range = np.linspace(min_rec, max_rec, n_sample_points, endpoint=True)
 
         rocs = []
 
@@ -152,48 +170,107 @@ def generate_bootstrap_count_curves(
             axis=-1,
         )
 
-        plt.semilogx(
+        ax.plot(
             mean_roc_curve[cat_id][:, 0],
             mean_roc_curve[cat_id][:, 1],
             'b-',
             label='mean',
-            fontsize=32,
         )
 
-        plt.fill_between(
+        ins.plot(
+            mean_roc_curve[cat_id][:, 0],
+            mean_roc_curve[cat_id][:, 1],
+            'b-',
+            label='mean',
+        )
+
+        ax.fill_between(
             interpolated_rocs[cat_id]['rec'],
             min_roc_prec[cat_id],
             max_roc_prec[cat_id],
             alpha=.2,
         )
 
+        ins.fill_between(
+            interpolated_rocs[cat_id]['rec'],
+            min_roc_prec[cat_id],
+            max_roc_prec[cat_id],
+            alpha=.2,
+        )
+
+        for rec, prec in zip(all_rec, all_prec):
+            ax.plot(rec, prec, 'r-', alpha=.1)
+            ins.plot(rec, prec, 'r-', alpha=.1)
+
         if test_ann is not None:
-            for t_ann in test_ann:
+            for t_ann, c in zip(test_ann, colors):
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
                 stats = count_point(gt_ann, t_pr, .5, weighted)
                 _prec_accuracy, _rec_per_image = calc_scores(stats, {}, {})
                 label = t_ann.split('/')[-1].replace('.json', '')
-                plt.plot(
+                if 'bobe' in label:
+                    label = 'bobe'
+                elif 'istvan' in label:
+                    label = 'istvan'
+                elif 'tea' in label:
+                    label = 'tea'
+                ax.plot(
                     _rec_per_image[cat_id][0],
                     _prec_accuracy[cat_id][0],
-                    '+',
-                    markersize=12,
-                    label=label,
-                    fontsize=32,
+                    'D',
+                    markersize=15,
+                    markeredgewidth=3,
+                    label=label +
+                    f' (Recall = {_rec_per_image[cat_id][0]})',
+                    c=c,
+                )
+                ins.plot(
+                    _rec_per_image[cat_id][0],
+                    _prec_accuracy[cat_id][0],
+                    'D',
+                    markersize=15,
+                    markeredgewidth=3,
+                    label=label +
+                    f' (Recall = {_rec_per_image[cat_id][0]})',
+                    c=c,
+                )
+                ax.hlines(
+                    y=_prec_accuracy[cat_id][0],
+                    xmin=np.min(rec),
+                    xmax=np.max(rec),
+                    linestyles='dashed',
+                    colors=c,
+                )
+                ax.text(
+                    x=np.min(rec), y=_prec_accuracy[cat_id][0] + 0.01, s=f' (Recall = {_rec_per_image[cat_id][0]})',
+                    fontdict={'fontsize': 20, 'fontweight': 'bold'},
+                )
+                ins.hlines(
+                    y=_prec_accuracy[cat_id][0],
+                    xmin=np.min(rec),
+                    xmax=np.max(rec),
+                    linestyles='dashed',
+                    colors=c,
                 )
 
-    plt.legend(loc='upper left')
+    ax.legend(loc='lower right', fontsize=25)
 
-    plt.title(plot_title, fontdict={'fontsize': 40})
-    plt.ylabel('Precision', fontdict={'fontsize': 32, 'fontweight': 'bold'})
-    plt.xlabel('Recall', fontdict={'fontsize': 32, 'fontweight': 'bold'})
+    ax.set_title(plot_title, fontdict={'fontsize': 35})
+    ax.set_ylabel(
+        'Precision', fontdict={
+            'fontsize': 30,
+        },
+    )
+    ax.set_xlabel('Recall', fontdict={'fontsize': 30})
 
-    plt.tight_layout()
+    ax.tick_params(axis='both', which='major', labelsize=30)
+    ins.tick_params(axis='both', which='major', labelsize=20)
 
-    plt.xlim(0.01, 1.01)
-    plt.ylim(0.01, 1.01)
+    ax.set_ylim(top=1.02)
+    ax.set_xlim(0.45, 1.0)
+
+    fig.tight_layout(pad=0.5)
+    fig.savefig(plot_output_path, dpi=150)
 
     os.remove('/tmp/tmp_bootstrap_gt.json')
     os.remove('/tmp/tmp_bootstrap_pred.json')
-
-    plt.savefig(plot_output_path, dpi=150)

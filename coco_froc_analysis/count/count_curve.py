@@ -6,6 +6,7 @@ from tqdm.auto import tqdm
 
 from ..utils import build_gt_id2annotations
 from ..utils import build_pr_id2annotations
+from ..utils import colors
 from ..utils import load_json_from_file
 from ..utils import transform_gt_into_pr
 from ..utils import update_scores
@@ -73,51 +74,98 @@ def generate_count_curve(
         precision, recall = calc_scores(stats, precision, recall)
 
     if plot_title:
-        plt.figure(figsize=(15, 15))
+        fig, ax = plt.subplots(figsize=[20, 9])
+        ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
+        ins.set_xlim([0.65, 1.0])
+        ins.set_xticks([.7, .75, .8, .85, .9, .95], fontsize=30)
 
     for category_id in precision:
         prec = precision[category_id]
         rec = recall[category_id]
         if plot_title:
-            plt.plot(
+            ax.plot(
                 prec,
                 rec,
                 'x--',
                 label='AI ' + stats[category_id]['name'],
-                fontsize=32,
+            )
+            ins.plot(
+                prec,
+                rec,
+                'x--',
+                label='AI ' + stats[category_id]['name'],
             )
 
             if test_ann is not None:
-                for t_ann in test_ann:
+                for t_ann, c in zip(test_ann, colors):
                     t_pr = transform_gt_into_pr(t_ann, gt_ann)
                     stats = count_point(gt_ann, t_pr, .5, weighted)
                     _precision, _recall = calc_scores(stats, {}, {})
                     label = t_ann.split('/')[-1].replace('.json', '')
-                    plt.plot(
-                        _precision[category_id][0],
-                        _recall[category_id][0],
-                        '+',
-                        markersize=12,
-                        label=label,
-                        fontsize=32,
-                    )
+                    if 'bobe' in label:
+                        label = 'bobe'
+                    elif 'istvan' in label:
+                        label = 'istvan'
+                    elif 'tea' in label:
+                        label = 'tea'
+                    if plot_title:
+                        ax.plot(
+                            _precision[category_id][0],
+                            _recall[category_id][0],
+                            'D',
+                            markersize=15,
+                            markeredgewidth=3,
+                            label=label +
+                            f' (Recall = {_recall[category_id][0]})',
+                            c=c,
+                        )
+                        ins.plot(
+                            _precision[category_id][0],
+                            _recall[category_id][0],
+                            'D',
+                            markersize=12,
+                            markeredgewidth=2,
+                            label=label +
+                            f' (Recall = {_recall[category_id][0]})',
+                            c=c,
+                        )
+                        ax.hlines(
+                            y=_precision[category_id][0],
+                            xmin=np.min(rec),
+                            xmax=np.max(rec),
+                            linestyles='dashed',
+                            colors=c,
+                        )
+                        ax.text(
+                            x=np.min(rec), y=_precision[category_id][0] + 0.01, s=f' (Recall = {_recall[category_id][0]})',
+                            fontdict={'fontsize': 20, 'fontweight': 'bold'},
+                        )
+                        ins.hlines(
+                            y=_precision[category_id][0],
+                            xmin=np.min(rec),
+                            xmax=np.max(rec),
+                            linestyles='dashed',
+                            colors=c,
+                        )
 
     if plot_title:
-        plt.legend(loc='lower right')
+        ax.legend(loc='lower right', fontsize=25)
 
-        plt.title(plot_title, fontdict={'fontsize': 40})
-        plt.ylabel(
+        ax.set_title(plot_title, fontdict={'fontsize': 35})
+        ax.set_ylabel(
             'Precision', fontdict={
-                'fontsize': 32, 'fontweight': 'bold',
+                'fontsize': 30,
             },
         )
-        plt.xlabel('Recall', fontdict={'fontsize': 32, 'fontweight': 'bold'})
+        ax.set_xlabel('Recall', fontdict={'fontsize': 30})
 
-        plt.tight_layout()
+        ax.tick_params(axis='both', which='major', labelsize=30)
+        ins.tick_params(axis='both', which='major', labelsize=20)
 
-        plt.xlim(0.01, 1.01)
-        plt.ylim(0.01, 1.01)
+        ax.set_ylim(top=1.02)
+        ax.set_xlim(0.45, 1.)
 
-        plt.savefig(plot_output_path, dpi=150)
+        fig.tight_layout(pad=0.5)
+        fig.savefig(plot_output_path, dpi=150)
     else:
         return precision, recall

@@ -16,10 +16,8 @@ def run(args):
                 pr_ann=args.pr_ann,
                 n_bootstrap_samples=args.bootstrap,
                 n_sample_points=args.n_sample_points,
-                plot_title=args.plot_title + ' (bootstrap)',
-                plot_output_path=args.plot_output_path.replace(
-                    '.png', '_bootstrap.png',
-                ),
+                plot_title='COUNTS PR (bootstrap)' if args.plot_title is None else args.plot_title,
+                plot_output_path='counts_bootstrap.png' if args.plot_output_path is None else args.plot_output_path,
                 weighted=args.weighted,
                 test_ann=args.test_ann,
             )
@@ -28,6 +26,9 @@ def run(args):
                 gt_ann=args.gt_ann,
                 pr_ann=args.pr_ann,
                 weighted=args.weighted,
+                plot_title='Counts PR' if args.plot_title is None else args.plot_title,
+                plot_output_path='counts.png' if args.plot_output_path is None else args.plot_output_path,
+                test_ann=args.test_ann,
             )
 
         exit(-1)
@@ -41,10 +42,8 @@ def run(args):
             use_iou=args.use_iou,
             iou_thres=args.iou_thres,
             n_sample_points=args.n_sample_points,
-            plot_title=args.plot_title + ' (bootstrap)',
-            plot_output_path=args.plot_output_path.replace(
-                '.png', '_bootstrap.png',
-            ),
+            plot_title='FROC (bootstrap)' if args.plot_title is None else args.plot_title,
+            plot_output_path='froc_bootstrap.png' if args.plot_output_path is None else args.plot_output_path,
             test_ann=args.test_ann,
         )
     else:
@@ -55,8 +54,8 @@ def run(args):
             use_iou=args.use_iou,
             iou_thres=args.iou_thres,
             n_sample_points=args.n_sample_points,
-            plot_title=args.plot_title,
-            plot_output_path=args.plot_output_path,
+            plot_title='FROC' if args.plot_title is None else args.plot_title,
+            plot_output_path='froc.png' if args.plot_output_path is None else args.plot_output_path,
             test_ann=args.test_ann,
         )
 
@@ -90,8 +89,8 @@ if __name__ == '__main__':
         default=50,
         help='Number of points to evaluate the FROC curve at.',
     )
-    parser.add_argument('--plot_title', type=str, default='FROC')
-    parser.add_argument('--plot_output_path', type=str, default='froc.png')
+    parser.add_argument('--plot_title', type=str)
+    parser.add_argument('--plot_output_path', type=str)
 
     parser.add_argument(
         '--test_ann',

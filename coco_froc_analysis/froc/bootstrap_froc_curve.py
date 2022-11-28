@@ -125,21 +125,21 @@ def generate_bootstrap_froc_curves(
     max_froc_lls = {}
     min_froc_lls = {}
 
+    min_nlls, max_nlls = np.min(non_bootstrap_nlls[cat_id]), np.max(
+        non_bootstrap_nlls[cat_id],
+    )
+
+    x_range = np.logspace(
+        np.log10(min_nlls), np.log10(max_nlls),
+        n_sample_points, endpoint=True,
+    )
+
     for cat_id in collected_frocs['lls']:
         all_lls = np.array(collected_frocs['lls'][cat_id]).reshape(
             n_bootstrap_samples, n_sample_points,
         )
         all_nlls = np.array(collected_frocs['nlls'][cat_id]).reshape(
             n_bootstrap_samples, n_sample_points,
-        )
-
-        min_nlls, max_nlls = np.min(non_bootstrap_nlls[cat_id]), np.max(
-            non_bootstrap_nlls[cat_id],
-        )
-
-        x_range = np.linspace(
-            min_nlls, max_nlls,
-            n_sample_points, endpoint=True,
         )
 
         frocs = []
@@ -166,27 +166,17 @@ def generate_bootstrap_froc_curves(
             axis=0,
         )
 
-    mean_froc_curve = {}
-
     for cat_id in interpolated_frocs:
-        mean_froc_curve[cat_id] = np.stack(
-            (
-                interpolated_frocs[cat_id]['nlls'],
-                np.mean(interpolated_frocs[cat_id]['lls'], axis=0),
-            ),
-            axis=-1,
-        )
-
         ax.semilogx(
-            mean_froc_curve[cat_id][:, 0],
-            mean_froc_curve[cat_id][:, 1],
+            interpolated_frocs[cat_id]['nlls'],
+            np.mean(interpolated_frocs[cat_id]['lls'], axis=0),
             'b-',
             label='mean',
         )
 
-        ins.semilogx(
-            mean_froc_curve[cat_id][:, 0],
-            mean_froc_curve[cat_id][:, 1],
+        ins.plot(
+            interpolated_frocs[cat_id]['nlls'],
+            np.mean(interpolated_frocs[cat_id]['lls'], axis=0),
             'b-',
             label='mean',
         )
@@ -207,7 +197,7 @@ def generate_bootstrap_froc_curves(
 
         for lls, nlls in zip(all_lls, all_nlls):
             ax.semilogx(nlls, lls, 'r-', alpha=.1)
-            ins.semilogx(nlls, lls, 'r-', alpha=.1)
+            ins.plot(nlls, lls, 'r-', alpha=.1)
 
         if test_ann is not None:
             for t_ann, c in zip(test_ann, colors):
@@ -231,7 +221,7 @@ def generate_bootstrap_froc_curves(
                     f' (FP/image = {_nlls_per_image[cat_id][0]})',
                     c=c,
                 )
-                ins.semilogx(
+                ins.plot(
                     _nlls_per_image[cat_id][0],
                     _lls_accuracy[cat_id][0],
                     'D',
@@ -264,7 +254,7 @@ def generate_bootstrap_froc_curves(
         ax.semilogx(
             non_bootstrap_nlls[cat_id], non_bootstrap_lls[cat_id], 'r--', label='non-bootstrap',
         )
-        ins.semilogx(
+        ins.plot(
             non_bootstrap_nlls[cat_id], non_bootstrap_lls[cat_id], 'r--', label='non-bootstrap',
         )
 
