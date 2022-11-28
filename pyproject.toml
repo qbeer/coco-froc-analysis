@@ -1,6 +1,33 @@
+[tool.poetry]
+name = "coco-froc-analysis"
+version = "0.1.1"
+description = "FROC analysis for COCO detections for Detectron(2) and OpenMMLab"
+authors = ["Alex Olar <olaralex666@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "coco_froc_analysis"}]
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+numpy = "^1.23.5"
+matplotlib = "^3.6.2"
+tqdm = "^4.64.1"
+scipy = "^1.9.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.20.0"
+mock = "^4.0.3"
+pdoc = "^12.3.0"
+coverage = "^6.5.0"
+flake8 = "^6.0.0"
+
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.flake8]
+max-line-length = 130
+extend-ignore = ["D203", "E203", "E251", "E266", "E302", "E305", "E401", "E402", "E501", "F401", "F403", "W503"]
+exclude = [".git", "__pycache__", "dist"]
+max-complexity = 10

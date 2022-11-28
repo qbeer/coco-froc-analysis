@@ -1,14 +1,26 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
+colors = [
+    'r', 'g', 'm', 'y', 'teal', 'magenta',
+    'royalblue', 'lime', 'forestgreen',
+]
 
-def transform_gt_into_pr(gt: str, true_gt: str) -> str:
+
+def transform_gt_into_pr(
+    gt: dict[str, list],
+    true_gt: dict[str, list],
+) -> str:
     gt = load_json_from_file(gt)
     true_gt = load_json_from_file(true_gt)
     id2trueId = {}
     for true_gt_img in true_gt['images']:
         for gt_img in gt['images']:
-            if true_gt_img['path'].split('/')[-1] == gt_img['path'].split('/')[-1]:
+            true_gt_img_name = true_gt_img['path'].split('/')[-1]
+            gt_img_name = gt_img['path'].split('/')[-1]
+            if true_gt_img_name == gt_img_name:
                 id2trueId[gt_img['id']] = true_gt_img['id']
     annotations = gt['annotations']
     scored_annotations = []
@@ -32,7 +44,7 @@ def load_json_from_file(file_path):
 def update_scores(json_data: list, score_thres: float) -> list:
     preds = []
     for _, pred in enumerate(json_data):
-        if pred["score"] > score_thres:
+        if pred['score'] > score_thres:
             preds.append(pred)
     return preds
 
@@ -83,20 +95,20 @@ def build_pr_id2annotations(pr: list) -> dict:
     """Build image to annotation dictionary based on list of predictions.
 
     Arguments:
-        pr {list} -- List of predictions from Detectron2 (coco-instance-results.json)
+        pr {list} -- Predictions from Detectron2 (coco-instance-results.json)
 
     Returns:
         id_to_annotation {dict} -- Image IDs to predicted annotations.
     """
-    id_to_annotation = dict()
+    id_to_annotation: dict[int, list[str]] = dict()
     for annotation in pr:
-        id_to_annotation[annotation["image_id"]] = []
+        id_to_annotation[annotation['image_id']] = []
     for annotation in pr:
         # DO not add the exact same annotation twice in the bootstrap case
-        for ann in id_to_annotation[annotation["image_id"]]:
+        for ann in id_to_annotation[annotation['image_id']]:
             if ann == annotation:
                 continue
-        id_to_annotation[annotation["image_id"]].append(annotation)
+        id_to_annotation[annotation['image_id']].append(annotation)
     return id_to_annotation
 
 
@@ -109,13 +121,13 @@ def build_gt_id2annotations(gt: dict) -> dict:
     Returns:
         id_to_annotation {dict} -- Image IDs to ground-truth annotations.
     """
-    id_to_annotation = dict()
-    for image in gt["images"]:
-        id_to_annotation[image["id"]] = []
-    for annotation in gt["annotations"]:
+    id_to_annotation: dict[int, list[str]] = dict()
+    for image in gt['images']:
+        id_to_annotation[image['id']] = []
+    for annotation in gt['annotations']:
         # DO not add the exact same annotation twice in the bootstrap case
-        for ann in id_to_annotation[annotation["image_id"]]:
+        for ann in id_to_annotation[annotation['image_id']]:
             if ann == annotation:
                 continue
-        id_to_annotation[annotation["image_id"]].append(annotation)
+        id_to_annotation[annotation['image_id']].append(annotation)
     return id_to_annotation
