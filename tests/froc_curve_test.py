@@ -88,7 +88,7 @@ class TestFrocCurve(unittest.TestCase):
                     stats[cat_id]['n_lesions'], specificity,
                 )
 
-    @mock.patch('froc_analysis.froc.froc_curve.tqdm', notqdm)
+    @mock.patch('coco_froc_analysis.froc.froc_curve.tqdm', notqdm)
     def test_froc_curve_generation_for_perfect_score(self):
         lls, nlls = generate_froc_curve(
             self.gt_ann_path,
@@ -102,7 +102,7 @@ class TestFrocCurve(unittest.TestCase):
         self.assertListEqual(lls[8], [1.0 for _ in range(10)])
         self.assertListEqual(nlls[8], [0.0 for _ in range(10)])
 
-    @mock.patch('froc_analysis.froc.froc_curve.tqdm', notqdm)
+    @mock.patch('coco_froc_analysis.froc.froc_curve.tqdm', notqdm)
     def test_froc_curve_generation_for_single_error_per_image(self):
         lls, nlls = generate_froc_curve(
             self.gt_ann_path,
@@ -116,7 +116,7 @@ class TestFrocCurve(unittest.TestCase):
         self.assertListEqual(lls[8], [0.7 for _ in range(10)])
         self.assertListEqual(nlls[8], [0.0 for _ in range(10)])
 
-    @mock.patch('froc_analysis.froc.froc_curve.tqdm', notqdm)
+    @mock.patch('coco_froc_analysis.froc.froc_curve.tqdm', notqdm)
     def test_froc_curve_generation_for_single_error_per_image_low_confidence(self):
         lls, nlls = generate_froc_curve(
             self.gt_ann_path,
@@ -132,7 +132,7 @@ class TestFrocCurve(unittest.TestCase):
         )
         self.assertListEqual(nlls[8], [0.0 for _ in range(10)])
 
-    @mock.patch('froc_analysis.froc.froc_curve.tqdm', notqdm)
+    @mock.patch('coco_froc_analysis.froc.froc_curve.tqdm', notqdm)
     def test_froc_curve_saving_to_plot(self):
         generate_froc_curve(
             self.gt_ann_path,

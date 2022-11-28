@@ -65,7 +65,7 @@ generate_bootstrap_curves(gt_ann='<path-to-your-ground-thruth-annotation-file>',
 ## CLI Usage
 
 ```bash
-usage: froc_analysis.py [-h] [--bootstrap N_BOOTSTRAP_ROUNDS] --gt_ann GT_ANN --pred_ann PRED_ANN [--use_iou] [--iou_thres IOU_THRES] [--n_sample_points N_SAMPLE_POINTS]
+python -m coco_froc_analysis [-h] [--bootstrap N_BOOTSTRAP_ROUNDS] --gt_ann GT_ANN --pred_ann PRED_ANN [--use_iou] [--iou_thres IOU_THRES] [--n_sample_points N_SAMPLE_POINTS]
                         [--plot_title PLOT_TITLE] [--plot_output_path PLOT_OUTPUT_PATH]
 
 optional arguments:
@@ -87,7 +87,7 @@ By default centroid closeness is used, if the `--use_iou` flag is set, `--iou_th
 ## Running tests
 
 ```bash
-python -m coverage run -m unittest -v
+python -m coverage run -m unittest discover --pattern "*_test.py" -v
 python -m coverage report -m
 ```
 
