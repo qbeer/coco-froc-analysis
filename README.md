@@ -97,7 +97,7 @@ python -m coverage report -m
 
 ```bash
 ace # for local CI pipeline
-poetry
+poetry publish --build -r testpypi
 ```
 
 ## @Regards, Alex
