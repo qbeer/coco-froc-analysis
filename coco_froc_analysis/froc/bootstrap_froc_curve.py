@@ -130,7 +130,7 @@ def generate_bootstrap_froc_curves(
     )
 
     x_range = np.logspace(
-        np.log10(min_nlls), np.log10(max_nlls),
+        np.log10(min_nlls + 1e-2), np.log10(max_nlls),
         n_sample_points, endpoint=True,
     )
 

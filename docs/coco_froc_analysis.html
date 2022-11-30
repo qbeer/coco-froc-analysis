@@ -27,8 +27,7 @@
   <ul>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#cli-usage">CLI Usage</a></li>
-    <li><a href="#running-tests">Running tests</a></li>
-    <li><a href="#regards-alex">@Regards, Alex</a></li>
+    <li><a href="#for-developers">For developers</a></li>
   </ul></li>
 </ul>
 
@@ -144,7 +143,9 @@ optional arguments:
 
 <p>By default centroid closeness is used, if the <code>--use_iou</code> flag is set, <code>--iou_thres</code> defaults to <code>.75</code> while the <code>--score_thres</code> score defaults to <code>.5</code>. The code outputs the FROC curve on the given detection results and GT dataset.</p>
 
-<h2 id="running-tests">Running tests</h2>
+<h2 id="for-developers">For developers</h2>
+
+<h3 id="running-tests">Running tests</h3>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code>python -m coverage run -m unittest discover --pattern <span class="s2">&quot;*_test.py&quot;</span> -v
@@ -152,7 +153,15 @@ python -m coverage report -m
 </code></pre>
 </div>
 
-<h2 id="regards-alex">@Regards, Alex</h2>
+<h3 id="building-and-publishing-reminder">Building and publishing (reminder)</h3>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>ace <span class="c1"># for local CI pipeline</span>
+poetry publish --build -r testpypi <span class="c1"># or without -r testpypi for publishing to pypi</span>
+</code></pre>
+</div>
+
+<p>@Regards, Alex</p>
 </div>
 
                         <input id="mod-coco_froc_analysis-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
