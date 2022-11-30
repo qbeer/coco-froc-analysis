@@ -1,2 +1,0 @@
-act
-poetry version patch
