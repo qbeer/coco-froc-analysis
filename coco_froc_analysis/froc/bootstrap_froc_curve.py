@@ -35,7 +35,7 @@ def generate_bootstrap_froc_curves(
 
     n_images = len(GT_ANN['images'])
 
-    fig, ax = plt.subplots(figsize=[20, 9])
+    fig, ax = plt.subplots(figsize=[27, 10])
     ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
     ins.set_xlim([0.1, 5.0])
     ins.set_xticks([0.1, 1.0, 2.0, 3.0, 4.0])
@@ -218,7 +218,7 @@ def generate_bootstrap_froc_curves(
                     markersize=15,
                     markeredgewidth=3,
                     label=label +
-                    f' (FP/image = {_nlls_per_image[cat_id][0]})',
+                    f'(FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
                     c=c,
                 )
                 ins.plot(
@@ -228,7 +228,7 @@ def generate_bootstrap_froc_curves(
                     markersize=12,
                     markeredgewidth=2,
                     label=label +
-                    f' (FP/image = {_nlls_per_image[cat_id][0]})',
+                    f'(FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
                     c=c,
                 )
                 ax.hlines(
@@ -247,7 +247,7 @@ def generate_bootstrap_froc_curves(
                 )
                 ax.text(
                     x=min_nlls, y=_lls_accuracy[cat_id][0] + 0.01,
-                    s=f' FP/image = {_nlls_per_image[cat_id][0]}',
+                    s=f'(FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
                     fontdict={'fontsize': 20, 'fontweight': 'bold'},
                 )
 
@@ -258,7 +258,13 @@ def generate_bootstrap_froc_curves(
             non_bootstrap_nlls[cat_id], non_bootstrap_lls[cat_id], 'r--', label='non-bootstrap',
         )
 
-    ax.legend(loc='upper right', fontsize=25)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax.legend(
+        loc='center left', bbox_to_anchor=(1, .5),
+        fancybox=True, shadow=True, ncol=1, fontsize=25,
+    )
 
     ax.set_title(plot_title, fontdict={'fontsize': 35})
     ax.set_ylabel('Sensitivity', fontdict={'fontsize': 30})
@@ -268,8 +274,6 @@ def generate_bootstrap_froc_curves(
     ins.tick_params(axis='both', which='major', labelsize=20)
 
     ax.set_ylim(top=1.02)
-    ax.set_xlim(min_nlls, max_nlls)
-    fig.tight_layout()
     fig.savefig(fname=plot_output_path, dpi=150)
 
     os.remove('/tmp/tmp_bootstrap_gt.json')

@@ -88,7 +88,7 @@ def generate_froc_curve(
         )
 
     if plot_title:
-        fig, ax = plt.subplots(figsize=[20, 9])
+        fig, ax = plt.subplots(figsize=[27, 10])
         ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
         ins.set_xlim([0.1, 5.0])
         ins.set_xticks([0.1, 1.0, 2.0, 3.0, 4.0], fontsize=30)
@@ -132,7 +132,7 @@ def generate_froc_curve(
                             markersize=15,
                             markeredgewidth=3,
                             label=label +
-                            f' (FP/image = {_nlls_per_image[category_id][0]})',
+                            f'(FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
                             c=c,
                         )
                         ins.plot(
@@ -142,7 +142,7 @@ def generate_froc_curve(
                             markersize=12,
                             markeredgewidth=2,
                             label=label +
-                            f' (FP/image = {_nlls_per_image[category_id][0]})',
+                            f'(FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
                             c=c,
                         )
                         ax.hlines(
@@ -161,12 +161,18 @@ def generate_froc_curve(
                         )
                         ax.text(
                             x=np.min(nlls), y=_lls_accuracy[category_id][0] + 0.01,
-                            s=f' FP/image = {_nlls_per_image[category_id][0]}',
+                            s=f'FP/image = {np.round(_nlls_per_image[category_id][0], 2)}',
                             fontdict={'fontsize': 20, 'fontweight': 'bold'},
                         )
 
     if plot_title:
-        ax.legend(loc='upper right', fontsize=25)
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+        ax.legend(
+            loc='center left', bbox_to_anchor=(1, .5),
+            fancybox=True, shadow=True, ncol=1, fontsize=25,
+        )
 
         ax.set_title(plot_title, fontdict={'fontsize': 35})
         ax.set_ylabel('Sensitivity', fontdict={'fontsize': 30})
@@ -176,7 +182,6 @@ def generate_froc_curve(
         ins.tick_params(axis='both', which='major', labelsize=20)
 
         ax.set_ylim(top=1.02)
-        fig.tight_layout()
         fig.savefig(fname=plot_output_path, dpi=150)
     else:
         return lls_accuracy, nlls_per_image

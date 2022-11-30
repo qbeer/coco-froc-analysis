@@ -84,11 +84,20 @@ optional arguments:
 
 By default centroid closeness is used, if the `--use_iou` flag is set, `--iou_thres` defaults to `.75` while the `--score_thres` score defaults to `.5`. The code outputs the FROC curve on the given detection results and GT dataset.
 
-## Running tests
+## For developers
+
+### Running tests
 
 ```bash
 python -m coverage run -m unittest discover --pattern "*_test.py" -v
 python -m coverage report -m
+```
+
+### Building and publishing (reminder)
+
+```bash
+ace # for local CI pipeline
+poetry
 ```
 
 ## @Regards, Alex

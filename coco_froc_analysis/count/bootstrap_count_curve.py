@@ -221,7 +221,7 @@ def generate_bootstrap_count_curves(
                     markersize=15,
                     markeredgewidth=3,
                     label=label +
-                    f' (Recall = {_rec_per_image[cat_id][0]})',
+                    f'(Recall = {np.round(_rec_per_image[cat_id][0], 3)})',
                     c=c,
                 )
                 ins.plot(
@@ -231,29 +231,36 @@ def generate_bootstrap_count_curves(
                     markersize=15,
                     markeredgewidth=3,
                     label=label +
-                    f' (Recall = {_rec_per_image[cat_id][0]})',
+                    f'(Recall = {np.round(_rec_per_image[cat_id][0], 3)})',
                     c=c,
                 )
                 ax.hlines(
                     y=_prec_accuracy[cat_id][0],
-                    xmin=np.min(rec),
-                    xmax=np.max(rec),
+                    xmin=np.min(all_rec),
+                    xmax=np.max(all_rec),
                     linestyles='dashed',
                     colors=c,
                 )
                 ax.text(
-                    x=np.min(rec), y=_prec_accuracy[cat_id][0] + 0.01, s=f' (Recall = {_rec_per_image[cat_id][0]})',
+                    x=np.min(all_rec), y=_prec_accuracy[cat_id][0] + 0.01,
+                    s=f'(Recall = {np.round(_rec_per_image[cat_id][0], 3)})',
                     fontdict={'fontsize': 20, 'fontweight': 'bold'},
                 )
                 ins.hlines(
                     y=_prec_accuracy[cat_id][0],
-                    xmin=np.min(rec),
-                    xmax=np.max(rec),
+                    xmin=np.min(all_rec),
+                    xmax=np.max(all_rec),
                     linestyles='dashed',
                     colors=c,
                 )
 
-    ax.legend(loc='lower right', fontsize=25)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+    ax.legend(
+        loc='center left', bbox_to_anchor=(1, .5),
+        fancybox=True, shadow=True, ncol=1, fontsize=25,
+    )
 
     ax.set_title(plot_title, fontdict={'fontsize': 35})
     ax.set_ylabel(
@@ -269,7 +276,6 @@ def generate_bootstrap_count_curves(
     ax.set_ylim(top=1.02)
     ax.set_xlim(0.45, 1.0)
 
-    fig.tight_layout(pad=0.5)
     fig.savefig(plot_output_path, dpi=150)
 
     os.remove('/tmp/tmp_bootstrap_gt.json')

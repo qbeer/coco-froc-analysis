@@ -149,7 +149,13 @@ def generate_count_curve(
                         )
 
     if plot_title:
-        ax.legend(loc='lower right', fontsize=25)
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+        ax.legend(
+            loc='center left', bbox_to_anchor=(1, .5),
+            fancybox=True, shadow=True, ncol=1, fontsize=25,
+        )
 
         ax.set_title(plot_title, fontdict={'fontsize': 35})
         ax.set_ylabel(
@@ -165,7 +171,6 @@ def generate_count_curve(
         ax.set_ylim(top=1.02)
         ax.set_xlim(0.45, 1.)
 
-        fig.tight_layout(pad=0.5)
         fig.savefig(plot_output_path, dpi=150)
     else:
         return precision, recall
