@@ -214,6 +214,12 @@ def generate_bootstrap_count_curves(
                     label = 'istvan'
                 elif 'tea' in label:
                     label = 'tea'
+                elif 'eszter' in label:
+                    label = 'eszter'
+                elif 'maryam' in label:
+                    label = 'maryam'
+                elif 'lea' in label:
+                    label = 'lea'
                 ax.plot(
                     _rec_per_image[cat_id][0],
                     _prec_accuracy[cat_id][0],
@@ -221,7 +227,7 @@ def generate_bootstrap_count_curves(
                     markersize=15,
                     markeredgewidth=3,
                     label=label +
-                    f'(Recall = {np.round(_rec_per_image[cat_id][0], 3)})',
+                    f' (R = {np.round(_rec_per_image[cat_id][0], 3)})',
                     c=c,
                 )
                 ins.plot(
@@ -231,7 +237,7 @@ def generate_bootstrap_count_curves(
                     markersize=15,
                     markeredgewidth=3,
                     label=label +
-                    f'(Recall = {np.round(_rec_per_image[cat_id][0], 3)})',
+                    f' (R = {np.round(_rec_per_image[cat_id][0], 3)})',
                     c=c,
                 )
                 ax.hlines(
@@ -242,8 +248,8 @@ def generate_bootstrap_count_curves(
                     colors=c,
                 )
                 ax.text(
-                    x=np.min(all_rec), y=_prec_accuracy[cat_id][0] + 0.01,
-                    s=f'(Recall = {np.round(_rec_per_image[cat_id][0], 3)})',
+                    x=min_rec, y=_prec_accuracy[cat_id][0] - 0.035,
+                    s=f' R = {np.round(_rec_per_image[cat_id][0], 3)}',
                     fontdict={'fontsize': 20, 'fontweight': 'bold'},
                 )
                 ins.hlines(
@@ -258,7 +264,7 @@ def generate_bootstrap_count_curves(
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(
-        loc='center left', bbox_to_anchor=(1, .5),
+        loc='center left', bbox_to_anchor=(.95, .75),
         fancybox=True, shadow=True, ncol=1, fontsize=25,
     )
 
@@ -273,8 +279,8 @@ def generate_bootstrap_count_curves(
     ax.tick_params(axis='both', which='major', labelsize=30)
     ins.tick_params(axis='both', which='major', labelsize=20)
 
-    ax.set_ylim(top=1.02)
-    ax.set_xlim(0.45, 1.0)
+    ax.set_ylim(bottom=0.05, top=1.02)
+    ax.set_xlim(min_rec, 1.0)
 
     fig.savefig(plot_output_path, dpi=150)
 

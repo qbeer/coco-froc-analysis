@@ -68,7 +68,7 @@ def run():
                 pr_ann=args.pr_ann,
                 n_bootstrap_samples=args.bootstrap,
                 n_sample_points=args.n_sample_points,
-                plot_title='COUNTS PR (bootstrap)' if args.plot_title is None else args.plot_title,
+                plot_title='Counts PR (bootstrap)' if args.plot_title is None else args.plot_title,
                 plot_output_path='counts_bootstrap.png' if args.plot_output_path is None else args.plot_output_path,
                 weighted=args.weighted,
                 test_ann=args.test_ann,

@@ -84,14 +84,14 @@ def generate_count_curve(
         rec = recall[category_id]
         if plot_title:
             ax.plot(
-                prec,
                 rec,
+                prec,
                 'x--',
                 label='AI ' + stats[category_id]['name'],
             )
             ins.plot(
-                prec,
                 rec,
+                prec,
                 'x--',
                 label='AI ' + stats[category_id]['name'],
             )
@@ -108,25 +108,31 @@ def generate_count_curve(
                         label = 'istvan'
                     elif 'tea' in label:
                         label = 'tea'
+                    elif 'eszter' in label:
+                        label = 'eszter'
+                    elif 'maryam' in label:
+                        label = 'maryam'
+                    elif 'lea' in label:
+                        label = 'lea'
                     if plot_title:
                         ax.plot(
-                            _precision[category_id][0],
                             _recall[category_id][0],
+                            _precision[category_id][0],
                             'D',
                             markersize=15,
                             markeredgewidth=3,
                             label=label +
-                            f' (Recall = {_recall[category_id][0]})',
+                            f' (R = {np.round(_recall[category_id][0], 3)})',
                             c=c,
                         )
                         ins.plot(
-                            _precision[category_id][0],
                             _recall[category_id][0],
+                            _precision[category_id][0],
                             'D',
                             markersize=12,
                             markeredgewidth=2,
                             label=label +
-                            f' (Recall = {_recall[category_id][0]})',
+                            f' (R = {np.round(_recall[category_id][0], 3)})',
                             c=c,
                         )
                         ax.hlines(
@@ -137,7 +143,7 @@ def generate_count_curve(
                             colors=c,
                         )
                         ax.text(
-                            x=np.min(rec), y=_precision[category_id][0] + 0.01, s=f' (Recall = {_recall[category_id][0]})',
+                            x=np.min(rec), y=_precision[category_id][0] - 0.035, s=f' R = {np.round(_recall[category_id][0], 3)}',
                             fontdict={'fontsize': 20, 'fontweight': 'bold'},
                         )
                         ins.hlines(
@@ -153,7 +159,7 @@ def generate_count_curve(
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
         ax.legend(
-            loc='center left', bbox_to_anchor=(1, .5),
+            loc='center left', bbox_to_anchor=(.95, .75),
             fancybox=True, shadow=True, ncol=1, fontsize=25,
         )
 
@@ -168,8 +174,8 @@ def generate_count_curve(
         ax.tick_params(axis='both', which='major', labelsize=30)
         ins.tick_params(axis='both', which='major', labelsize=20)
 
-        ax.set_ylim(top=1.02)
-        ax.set_xlim(0.45, 1.)
+        ax.set_ylim(bottom=0.05, top=1.02)
+        ax.set_xlim(np.min(rec), 1)
 
         fig.savefig(plot_output_path, dpi=150)
     else:

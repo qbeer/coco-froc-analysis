@@ -124,6 +124,12 @@ def generate_froc_curve(
                         label = 'istvan'
                     elif 'tea' in label:
                         label = 'tea'
+                    elif 'eszter' in label:
+                        label = 'eszter'
+                    elif 'maryam' in label:
+                        label = 'maryam'
+                    elif 'lea' in label:
+                        label = 'lea'
                     if plot_title:
                         ax.plot(
                             _nlls_per_image[category_id][0],
@@ -132,7 +138,7 @@ def generate_froc_curve(
                             markersize=15,
                             markeredgewidth=3,
                             label=label +
-                            f'(FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
+                            f' (FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
                             c=c,
                         )
                         ins.plot(
@@ -142,7 +148,7 @@ def generate_froc_curve(
                             markersize=12,
                             markeredgewidth=2,
                             label=label +
-                            f'(FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
+                            f' (FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
                             c=c,
                         )
                         ax.hlines(
@@ -160,8 +166,8 @@ def generate_froc_curve(
                             colors=c,
                         )
                         ax.text(
-                            x=np.min(nlls), y=_lls_accuracy[category_id][0] + 0.01,
-                            s=f'FP/image = {np.round(_nlls_per_image[category_id][0], 2)}',
+                            x=np.min(nlls), y=_lls_accuracy[category_id][0] - 0.02,
+                            s=f' FP/image = {np.round(_nlls_per_image[category_id][0], 2)}',
                             fontdict={'fontsize': 20, 'fontweight': 'bold'},
                         )
 
@@ -170,7 +176,7 @@ def generate_froc_curve(
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
         ax.legend(
-            loc='center left', bbox_to_anchor=(1, .5),
+            loc='center left', bbox_to_anchor=(.95, .75),
             fancybox=True, shadow=True, ncol=1, fontsize=25,
         )
 
@@ -181,7 +187,7 @@ def generate_froc_curve(
         ax.tick_params(axis='both', which='major', labelsize=30)
         ins.tick_params(axis='both', which='major', labelsize=20)
 
-        ax.set_ylim(top=1.02)
+        ax.set_ylim(bottom=0.05, top=1.02)
         fig.savefig(fname=plot_output_path, dpi=150)
     else:
         return lls_accuracy, nlls_per_image
