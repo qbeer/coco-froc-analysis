@@ -143,7 +143,8 @@ def generate_count_curve(
                             colors=c,
                         )
                         ax.text(
-                            x=np.min(rec), y=_precision[category_id][0] - 0.035, s=f' R = {np.round(_recall[category_id][0], 3)}',
+                            x=np.min(rec), y=_precision[category_id][0] - 0.035,
+                            s=f' R = {np.round(_recall[category_id][0], 3)}',
                             fontdict={'fontsize': 20, 'fontweight': 'bold'},
                         )
                         ins.hlines(
