@@ -65,13 +65,13 @@ def update_stats(
     Returns:
         stats {dict} -- Updated FROC statistics
     """
-    for image_id in gt_id_to_annotation:
+
+    for image_id, gt_ann in gt_id_to_annotation.items():
         cat2anns: dict[int, dict[str, list]] = {}
         for cat in categories:
             cat2anns[cat['id']] = {'gt': [], 'pr': []}
-
-        for gt_ann in gt_id_to_annotation[image_id]:
-            cat2anns[gt_ann['category_id']]['gt'].append(gt_ann)
+        for ann in gt_ann:
+            cat2anns[ann['category_id']]['gt'].append(ann)
         for pred_ann in pr_id_to_annotation.get(image_id, []):
             cat2anns[pred_ann['category_id']]['pr'].append(pred_ann)
 
@@ -85,9 +85,10 @@ def update_stats(
             if n_gt == 0:
                 if n_pr == 0:
                     continue
-                stats[cat['id']]['NL'] += n_pr
+                n_false_positives = n_pr
+                stats[cat['id']]['NL'] += n_false_positives
             else:
-                cost_matrix = np.ones((n_gt, n_pr)) * 1e6
+                cost_matrix = np.ones((n_gt, n_pr)) * np.inf
 
                 for gt_ind, gt_ann in enumerate(gt_anns):
                     for pr_ind, pr_ann in enumerate(pr_anns):
@@ -97,9 +98,7 @@ def update_stats(
                                 pr_ann['bbox'],
                             )
                             if iou_score > iou_thres:
-                                cost_matrix[gt_ind, pr_ind] = iou_score / (
-                                    np.random.uniform(0, 1) / 1e6
-                                )
+                                cost_matrix[gt_ind, pr_ind] = 0.0
                         else:
                             gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
 
@@ -112,16 +111,24 @@ def update_stats(
                                 and pr_bbox_center[1] >= gt_y
                                 and pr_bbox_center[1] <= gt_y + gt_h
                             ):
-                                cost_matrix[gt_ind, pr_ind] = 1.0
+                                cost_matrix[gt_ind, pr_ind] = 0.0
 
-                row_ind, col_ind = linear_sum_assignment(
-                    cost_matrix,
-                )  # Hungarian-matching
+                try:
+                    row_ind, col_ind = linear_sum_assignment(
+                        cost_matrix,
+                    )  # Hungarian-matching
 
-                n_true_positives = len(row_ind)
-                n_false_positives = max(n_pr - len(col_ind), 0)
+                    n_true_positives = len(row_ind)
+                    n_false_positives = max(n_pr - len(col_ind), 0)
 
-                stats[cat['id']]['LL'] += n_true_positives
-                stats[cat['id']]['NL'] += n_false_positives
+                    print('TP', n_true_positives, 'n_gt', n_gt)
+                    print('FP', n_false_positives, 'n_pr', n_pr)
+                    print('COST_MATRX', cost_matrix)
+                    print('*' * 25, end='\n\n')
+
+                    stats[cat['id']]['LL'] += n_true_positives
+                    stats[cat['id']]['NL'] += n_false_positives
+                except ValueError:
+                    stats[cat['id']]['NL'] += n_pr
 
     return stats
