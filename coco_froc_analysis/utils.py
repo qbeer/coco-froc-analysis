@@ -18,8 +18,8 @@ def transform_gt_into_pr(
     id2trueId = {}
     for true_gt_img in true_gt['images']:
         for gt_img in gt['images']:
-            true_gt_img_name = true_gt_img['path'].split('/')[-1]
-            gt_img_name = gt_img['path'].split('/')[-1]
+            true_gt_img_name = true_gt_img['file_name']
+            gt_img_name = gt_img['file_name']
             if true_gt_img_name == gt_img_name:
                 id2trueId[gt_img['id']] = true_gt_img['id']
     annotations = gt['annotations']
