@@ -121,11 +121,6 @@ def update_stats(
                     n_true_positives = len(row_ind)
                     n_false_positives = max(n_pr - len(col_ind), 0)
 
-                    print('TP', n_true_positives, 'n_gt', n_gt)
-                    print('FP', n_false_positives, 'n_pr', n_pr)
-                    print('COST_MATRX', cost_matrix)
-                    print('*' * 25, end='\n\n')
-
                     stats[cat['id']]['LL'] += n_true_positives
                     stats[cat['id']]['NL'] += n_false_positives
                 except ValueError:
