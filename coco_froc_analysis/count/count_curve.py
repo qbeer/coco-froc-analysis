@@ -98,22 +98,10 @@ def generate_count_curve(
 
             if test_ann is not None:
                 for t_ann, c in zip(test_ann, colors):
+                    t_ann, label = t_ann
                     t_pr = transform_gt_into_pr(t_ann, gt_ann)
                     stats = count_point(gt_ann, t_pr, .5, weighted)
                     _precision, _recall = calc_scores(stats, {}, {})
-                    label = t_ann.split('/')[-1].replace('.json', '')
-                    if 'bobe' in label:
-                        label = 'bobe'
-                    elif 'istvan' in label:
-                        label = 'istvan'
-                    elif 'tea' in label:
-                        label = 'tea'
-                    elif 'eszter' in label:
-                        label = 'eszter'
-                    elif 'maryam' in label:
-                        label = 'maryam'
-                    elif 'lea' in label:
-                        label = 'lea'
                     if plot_title:
                         ax.plot(
                             _recall[category_id][0],

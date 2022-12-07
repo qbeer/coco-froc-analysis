@@ -1,11 +1,23 @@
 from __future__ import annotations
 
 import argparse
+import random
+import string
 
 from .count import generate_bootstrap_count_curves
 from .count import generate_count_curve
 from .froc import generate_bootstrap_froc_curves
 from .froc import generate_froc_curve
+
+
+def test_point(val):
+    try:
+        json_file, annotator = val.split(',')
+        return json_file, annotator
+    except ValueError:
+        print('assigning random annotator ID')
+        letters = string.ascii_lowercase
+        return val, 'test_' + ''.join(random.choice(letters) for _ in range(3))
 
 
 def run():
@@ -43,7 +55,9 @@ def run():
     parser.add_argument(
         '--test_ann',
         action='append',
-        help='Extra ground-truth like annotations',
+        help='Extra ground-truth like annotations with annotator name/ID.',
+        type=test_point,
+        dest='test_ann',
         required=False,
     )
 
