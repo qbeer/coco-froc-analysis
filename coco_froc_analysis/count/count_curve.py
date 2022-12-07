@@ -6,7 +6,7 @@ from tqdm.auto import tqdm
 
 from ..utils import build_gt_id2annotations
 from ..utils import build_pr_id2annotations
-from ..utils import colors
+from ..utils import COLORS
 from ..utils import load_json_from_file
 from ..utils import transform_gt_into_pr
 from ..utils import update_scores
@@ -97,7 +97,7 @@ def generate_count_curve(
             )
 
             if test_ann is not None:
-                for t_ann, c in zip(test_ann, colors):
+                for t_ann, c in zip(test_ann, COLORS):
                     t_pr = transform_gt_into_pr(t_ann, gt_ann)
                     stats = count_point(gt_ann, t_pr, .5, weighted)
                     _precision, _recall = calc_scores(stats, {}, {})

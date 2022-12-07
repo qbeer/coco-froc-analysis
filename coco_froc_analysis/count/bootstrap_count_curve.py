@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
 
-from ..utils import colors
+from ..utils import COLORS
 from ..utils import transform_gt_into_pr
 from .count_curve import calc_scores
 from .count_curve import count_point
@@ -203,7 +203,7 @@ def generate_bootstrap_count_curves(
             ins.plot(rec, prec, 'r-', alpha=.1)
 
         if test_ann is not None:
-            for t_ann, c in zip(test_ann, colors):
+            for t_ann, c in zip(test_ann, COLORS):
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
                 stats = count_point(gt_ann, t_pr, .5, weighted)
                 _prec_accuracy, _rec_per_image = calc_scores(stats, {}, {})
