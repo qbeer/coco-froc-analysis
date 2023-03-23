@@ -96,7 +96,7 @@ python -m coverage report -m
 ### Building and publishing (reminder)
 
 ```bash
-act # for local CI pipeline
+ace # for local CI pipeline
 pdoc -d google coco_froc_analysis -o docs # build docs
 poetry publish --build -r testpypi # or without -r testpypi for publishing to pypi
 ```
