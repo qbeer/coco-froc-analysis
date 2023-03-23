@@ -6,7 +6,7 @@ from tqdm.auto import tqdm
 
 from ..utils import build_gt_id2annotations
 from ..utils import build_pr_id2annotations
-from ..utils import colors
+from ..utils import COLORS
 from ..utils import load_json_from_file
 from ..utils import transform_gt_into_pr
 from ..utils import update_scores
@@ -77,7 +77,12 @@ def generate_count_curve(
         fig, ax = plt.subplots(figsize=[20, 9])
         ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
         ins.set_xlim([0.65, 1.0])
-        ins.set_xticks([.7, .75, .8, .85, .9, .95], fontsize=30)
+        ins.set_xticks(
+            [.7, .75, .8, .85, .9, .95],
+            [.7, .75, .8, .85, .9, .95], fontsize=30,
+        )
+        ins.yaxis.tick_right()
+        ins.xaxis.tick_top()
 
     for category_id in precision:
         prec = precision[category_id]
@@ -97,7 +102,7 @@ def generate_count_curve(
             )
 
             if test_ann is not None:
-                for t_ann, c in zip(test_ann, colors):
+                for t_ann, c in zip(test_ann, COLORS):
                     t_ann, label = t_ann
                     t_pr = transform_gt_into_pr(t_ann, gt_ann)
                     stats = count_point(gt_ann, t_pr, .5, weighted)

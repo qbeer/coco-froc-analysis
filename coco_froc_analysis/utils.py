@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-colors = [
+COLORS = [
     'r', 'g', 'm', 'y', 'teal', 'magenta',
     'royalblue', 'lime', 'forestgreen',
 ]

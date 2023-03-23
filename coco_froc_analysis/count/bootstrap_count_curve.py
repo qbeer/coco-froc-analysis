@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
 
-from ..utils import colors
+from ..utils import COLORS
 from ..utils import transform_gt_into_pr
 from .count_curve import calc_scores
 from .count_curve import count_point
@@ -37,8 +37,9 @@ def generate_bootstrap_count_curves(
     fig, ax = plt.subplots(figsize=[20, 9])
     ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
     ins.set_xlim([0.8, 1.0])
-    ins.set_xticks([.85, .9, .95, 1.], fontsize=30)
-    ins.set_ylim(bottom=0.2)
+    ins.set_xticks([.85, .9, .95], [.85, .9, .95], fontsize=30)
+    ins.yaxis.tick_right()
+    ins.xaxis.tick_top()
 
     collected_rocs = {'precision': {}, 'recall': {}}
 
@@ -203,7 +204,7 @@ def generate_bootstrap_count_curves(
             ins.plot(rec, prec, 'r-', alpha=.1)
 
         if test_ann is not None:
-            for t_ann, c in zip(test_ann, colors):
+            for t_ann, c in zip(test_ann, COLORS):
                 t_ann, label = t_ann
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
                 stats = count_point(gt_ann, t_pr, .5, weighted)
