@@ -204,6 +204,7 @@ def generate_bootstrap_count_curves(
 
         if test_ann is not None:
             for t_ann, c in zip(test_ann, COLORS):
+                t_ann, label = t_ann
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
                 stats = count_point(gt_ann, t_pr, .5, weighted)
                 _prec_accuracy, _rec_per_image = calc_scores(stats, {}, {})

@@ -98,6 +98,7 @@ def generate_count_curve(
 
             if test_ann is not None:
                 for t_ann, c in zip(test_ann, COLORS):
+                    t_ann, label = t_ann
                     t_pr = transform_gt_into_pr(t_ann, gt_ann)
                     stats = count_point(gt_ann, t_pr, .5, weighted)
                     _precision, _recall = calc_scores(stats, {}, {})

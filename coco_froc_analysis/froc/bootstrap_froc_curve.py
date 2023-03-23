@@ -201,6 +201,7 @@ def generate_bootstrap_froc_curves(
 
         if test_ann is not None:
             for t_ann, c in zip(test_ann, COLORS):
+                t_ann, label = t_ann
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
                 stats = froc_point(gt_ann, t_pr, .5, use_iou, iou_thres)
                 _lls_accuracy, _nlls_per_image = calc_scores(stats, {}, {})
