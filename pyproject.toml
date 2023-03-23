@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "coco-froc-analysis"
-version = "0.2.2"
+version = "0.2.3"
 description = "FROC analysis for COCO detections for Detectron(2) and OpenMMLab"
 authors = ["Alex Olar <olaralex666@gmail.com>"]
 license = "MIT"
