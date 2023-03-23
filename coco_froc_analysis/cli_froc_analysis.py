@@ -21,6 +21,9 @@ def test_point(val):
 
 
 def run():
+    """
+    Run the FROC analysis. This function is called from the command line.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--bootstrap',
@@ -92,6 +95,7 @@ def run():
                 gt_ann=args.gt_ann,
                 pr_ann=args.pr_ann,
                 weighted=args.weighted,
+                n_sample_points=args.n_sample_points,
                 plot_title='Counts PR' if args.plot_title is None else args.plot_title,
                 plot_output_path='counts.png' if args.plot_output_path is None else args.plot_output_path,
                 test_ann=args.test_ann,

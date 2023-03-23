@@ -11,7 +11,7 @@ from tqdm.auto import tqdm
 
 from ..utils import transform_gt_into_pr
 from .froc_curve import calc_scores
-from .froc_curve import colors
+from .froc_curve import COLORS
 from .froc_curve import froc_point
 from .froc_curve import generate_froc_curve
 
@@ -200,7 +200,7 @@ def generate_bootstrap_froc_curves(
             ins.plot(nlls, lls, 'r-', alpha=.1)
 
         if test_ann is not None:
-            for t_ann, c in zip(test_ann, colors):
+            for t_ann, c in zip(test_ann, COLORS):
                 t_ann, label = t_ann
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
                 stats = froc_point(gt_ann, t_pr, .5, use_iou, iou_thres)

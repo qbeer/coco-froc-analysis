@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-colors = [
+COLORS = [
     'r', 'g', 'm', 'y', 'teal', 'magenta',
     'royalblue', 'lime', 'forestgreen',
 ]
@@ -13,6 +13,10 @@ def transform_gt_into_pr(
     gt: dict[str, list],
     true_gt: dict[str, list],
 ) -> str:
+    """
+    Transform ground-truth annotations into prediction annotations by
+    adding score and category_id fields.
+    """
     gt = load_json_from_file(gt)
     true_gt = load_json_from_file(true_gt)
     id2trueId = {}
@@ -36,12 +40,18 @@ def transform_gt_into_pr(
 
 
 def load_json_from_file(file_path):
+    """
+    Load json file.
+    """
     with Path(file_path).open() as fp:
         data = json.load(fp)
     return data
 
 
 def update_scores(json_data: list, score_thres: float) -> list:
+    """
+    Update scores of predictions, exclude the predictions below the scoring threshold.
+    """
     preds = []
     for _, pred in enumerate(json_data):
         if pred['score'] > score_thres:

@@ -48,7 +48,7 @@ def update_stats(
                 else:
                     stats[cat['id']]['FP'] += n_pr
             else:
-                cost_matrix = np.ones((n_gt, n_pr)) * np.finfo(np.float64).max
+                cost_matrix = np.ones((n_gt, n_pr)) * np.inf
 
                 for gt_ind, gt_ann in enumerate(gt_anns):
                     for pr_ind, pr_ann in enumerate(pr_anns):
@@ -58,11 +58,7 @@ def update_stats(
                                 pr_ann['bbox'],
                             )
                             if overlap > 0.:
-                                weight = 1. / (
-                                    overlap +
-                                    np.random.uniform(0, 1) / 1e-6
-                                )
-                                cost_matrix[gt_ind, pr_ind] = weight
+                                cost_matrix[gt_ind, pr_ind] = 1.0 / overlap
                         else:
                             gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
 
@@ -78,19 +74,22 @@ def update_stats(
                                 cost_matrix[
                                     gt_ind,
                                     pr_ind,
-                                ] = 1.0  # connected, not weighted
+                                ] = 0.0  # connected, not weighted
 
-                row_ind, col_ind = linear_sum_assignment(
-                    cost_matrix,
-                )  # Hungarian-matching
+                try:
+                    row_ind, col_ind = linear_sum_assignment(
+                        cost_matrix,
+                    )  # Hungarian-matching
 
-                n_true_positives = len(row_ind)
-                n_false_positives = max(n_pr - len(col_ind), 0)
-                n_false_negatives = max(n_gt - len(row_ind), 0)
+                    n_true_positives = len(row_ind)
+                    n_false_positives = max(n_pr - len(col_ind), 0)
+                    n_false_negatives = max(n_gt - len(row_ind), 0)
 
-                stats[cat['id']]['P'] += n_gt
-                stats[cat['id']]['TP'] += n_true_positives
-                stats[cat['id']]['FP'] += n_false_positives
-                stats[cat['id']]['FN'] += n_false_negatives
+                    stats[cat['id']]['P'] += n_gt
+                    stats[cat['id']]['TP'] += n_true_positives
+                    stats[cat['id']]['FP'] += n_false_positives
+                    stats[cat['id']]['FN'] += n_false_negatives
+                except ValueError:
+                    stats[cat['id']]['FP'] += n_pr
 
     return stats
