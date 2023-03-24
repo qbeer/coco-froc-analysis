@@ -103,20 +103,62 @@ coco_froc_analysis    </h1>
 <h2 id="usage">Usage</h2>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span> <span class="nn">froc_analysis</span> <span class="kn">import</span> <span class="n">generate_froc_curve</span><span class="p">,</span> <span class="n">generate_bootstrap_curves</span>
+<pre><span></span><code><span class="kn">from</span> <span class="nn"><a href="coco_froc_analysis/count.html">coco_froc_analysis.count</a></span> <span class="kn">import</span> <span class="n">generate_bootstrap_count_curves</span>
+<span class="kn">from</span> <span class="nn"><a href="coco_froc_analysis/count.html">coco_froc_analysis.count</a></span> <span class="kn">import</span> <span class="n">generate_count_curve</span>
+<span class="kn">from</span> <span class="nn"><a href="coco_froc_analysis/froc.html">coco_froc_analysis.froc</a></span> <span class="kn">import</span> <span class="n">generate_bootstrap_froc_curves</span>
+<span class="kn">from</span> <span class="nn"><a href="coco_froc_analysis/froc.html">coco_froc_analysis.froc</a></span> <span class="kn">import</span> <span class="n">generate_froc_curve</span>
 
 <span class="c1"># For single FROC curve</span>
-<span class="n">generate_froc_curve</span><span class="p">(</span><span class="n">gt_ann</span><span class="o">=</span><span class="s1">&#39;&lt;path-to-your-ground-thruth-annotation-file&gt;&#39;</span><span class="p">,</span>
-                    <span class="n">pr_ann</span><span class="o">=</span><span class="s1">&#39;&lt;path-to-Detectron2-or-mmdetection-prediction-file&gt;&#39;</span><span class="p">,</span>
-                    <span class="n">use_iou</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">iou_thres</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">n_sample_points</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span>
-                    <span class="n">plot_title</span><span class="o">=</span><span class="s1">&#39;FROC&#39;</span><span class="p">,</span> <span class="n">plot_output_path</span><span class="o">=</span><span class="s1">&#39;froc.png&#39;</span><span class="p">)</span>
+<span class="n">generate_froc_curve</span><span class="p">(</span>
+            <span class="n">gt_ann</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">gt_ann</span><span class="p">,</span>
+            <span class="n">pr_ann</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pr_ann</span><span class="p">,</span>
+            <span class="n">use_iou</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">use_iou</span><span class="p">,</span>
+            <span class="n">iou_thres</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">iou_thres</span><span class="p">,</span>
+            <span class="n">n_sample_points</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_sample_points</span><span class="p">,</span>
+            <span class="n">plot_title</span><span class="o">=</span><span class="s1">&#39;FROC&#39;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_title</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_title</span><span class="p">,</span>
+            <span class="n">plot_output_path</span><span class="o">=</span><span class="s1">&#39;froc.png&#39;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_output_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_output_path</span><span class="p">,</span>
+            <span class="n">test_ann</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">test_ann</span><span class="p">,</span>
+        <span class="p">)</span>
 
 <span class="c1"># For bootstrapped curves</span>
-<span class="n">generate_bootstrap_curves</span><span class="p">(</span><span class="n">gt_ann</span><span class="o">=</span><span class="s1">&#39;&lt;path-to-your-ground-thruth-annotation-file&gt;&#39;</span><span class="p">,</span>
-                          <span class="n">pr_ann</span><span class="o">=</span><span class="s1">&#39;&lt;path-to-Detectron2-or-mmdetection-prediction-file&gt;&#39;</span><span class="p">,</span>
-                          <span class="n">n_bootstrap_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-                          <span class="n">use_iou</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">iou_thres</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">n_sample_points</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-                          <span class="n">plot_title</span><span class="o">=</span><span class="s1">&#39;FROC&#39;</span><span class="p">,</span> <span class="n">plot_output_path</span><span class="o">=</span><span class="s1">&#39;froc.png&#39;</span><span class="p">)</span>
+<span class="n">generate_bootstrap_froc_curves</span><span class="p">(</span>
+            <span class="n">gt_ann</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">gt_ann</span><span class="p">,</span>
+            <span class="n">pr_ann</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">pr_ann</span><span class="p">,</span>
+            <span class="n">n_bootstrap_samples</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">bootstrap</span><span class="p">,</span>
+            <span class="n">use_iou</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">use_iou</span><span class="p">,</span>
+            <span class="n">iou_thres</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">iou_thres</span><span class="p">,</span>
+            <span class="n">n_sample_points</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">n_sample_points</span><span class="p">,</span>
+            <span class="n">plot_title</span><span class="o">=</span><span class="s1">&#39;FROC (bootstrap)&#39;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_title</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_title</span><span class="p">,</span>
+            <span class="n">plot_output_path</span><span class="o">=</span><span class="s1">&#39;froc_bootstrap.png&#39;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_output_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_output_path</span><span class="p">,</span>
+            <span class="n">test_ann</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">test_ann</span><span class="p">,</span>
+        <span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Please check <code>run.py</code> for more details. The <code>IoU</code> part of this code is not reliable and currently the codebase only works for binary evaluation, but any multiclass problem could be chunked up to work with it.</p>
+
+<p>Description of <code>run.py</code> arguments:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>usage: run.py <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>--bootstrap BOOTSTRAP<span class="o">]</span> --gt_ann GT_ANN --pr_ann PR_ANN <span class="o">[</span>--use_iou<span class="o">]</span> <span class="o">[</span>--iou_thres IOU_THRES<span class="o">]</span> <span class="o">[</span>--n_sample_points N_SAMPLE_POINTS<span class="o">]</span>
+              <span class="o">[</span>--plot_title PLOT_TITLE<span class="o">]</span> <span class="o">[</span>--plot_output_path PLOT_OUTPUT_PATH<span class="o">]</span> <span class="o">[</span>--test_ann TEST_ANN<span class="o">]</span> <span class="o">[</span>--counts<span class="o">]</span> <span class="o">[</span>--weighted<span class="o">]</span>
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --bootstrap BOOTSTRAP
+                        Whether to <span class="k">do</span> a single or bootstrap runs.
+  --gt_ann GT_ANN
+  --pr_ann PR_ANN
+  --use_iou             Use IoU score to decide based on <span class="sb">`</span>proximity<span class="sb">`</span>
+  --iou_thres IOU_THRES
+                        If IoU score is used the default threshold is <span class="nb">set</span> to .5
+  --n_sample_points N_SAMPLE_POINTS
+                        Number of points to evaluate the FROC curve at.
+  --plot_title PLOT_TITLE
+  --plot_output_path PLOT_OUTPUT_PATH
+  --test_ann TEST_ANN   Extra ground-truth like annotations
+  --counts
+  --weighted
 </code></pre>
 </div>
 
@@ -164,6 +206,16 @@ poetry publish --build -r test-pypi <span class="c1"># or without -r test-pypi f
 </div>
 
 <p>@Regards, Alex</p>
+
+<pre><code>@misc{qbeer,
+  author       = {Alex Olar},
+  title        = {FROC analysis for COCO-like file format},
+  howpublished = {GitHub repository},
+  month        = {September},
+  year         = {2022},
+  url          = {https://github.com/qbeer/coco-froc-analysis}
+}
+</code></pre>
 </div>
 
                         <input id="mod-coco_froc_analysis-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
