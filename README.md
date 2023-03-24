@@ -103,3 +103,14 @@ poetry publish --build -r test-pypi # or without -r test-pypi for publishing to 
 ```
 
 @Regards, Alex
+
+```
+@misc{qbeer,
+  author       = {Alex Olar},
+  title        = {FROC analysis for COCO-like file format},
+  howpublished = {GitHub repository},
+  month        = {September},
+  year         = {2022},
+  url          = {https://github.com/qbeer/coco-froc-analysis}
+}
+```
