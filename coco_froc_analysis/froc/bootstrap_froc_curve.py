@@ -37,12 +37,12 @@ def generate_bootstrap_froc_curves(
 
     fig, ax = plt.subplots(figsize=[27, 10])
     ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
-    ins.set_xlim([0.1, 5.0])
     ins.set_xticks(
         [0.1, 1.0, 2.0, 3.0, 4.0], [
             0.1, 1.0, 2.0, 3.0, 4.0,
         ], fontsize=30,
     )
+    ins.set_xlim([0.1, 4.5])
 
     collected_frocs = {'lls': {}, 'nlls': {}}
 
@@ -199,10 +199,6 @@ def generate_bootstrap_froc_curves(
             alpha=.2,
         )
 
-        for lls, nlls in zip(all_lls, all_nlls):
-            ax.semilogx(nlls, lls, 'r-', alpha=.1)
-            ins.plot(nlls, lls, 'r-', alpha=.1)
-
         if test_ann is not None:
             for t_ann, c in zip(test_ann, COLORS):
                 t_ann, label = t_ann
@@ -249,18 +245,11 @@ def generate_bootstrap_froc_curves(
                     fontdict={'fontsize': 20, 'fontweight': 'bold'},
                 )
 
-        ax.semilogx(
-            non_bootstrap_nlls[cat_id], non_bootstrap_lls[cat_id], 'r--', label='non-bootstrap',
-        )
-        ins.plot(
-            non_bootstrap_nlls[cat_id], non_bootstrap_lls[cat_id], 'r--', label='non-bootstrap',
-        )
-
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(
-        loc='center left', bbox_to_anchor=(.95, .75),
+        loc='center left', bbox_to_anchor=(.8, .6),
         fancybox=True, shadow=True, ncol=1, fontsize=25,
     )
 
@@ -271,8 +260,8 @@ def generate_bootstrap_froc_curves(
     ax.tick_params(axis='both', which='major', labelsize=30)
     ins.tick_params(axis='both', which='major', labelsize=20)
 
-    ax.set_xlim([min_nlls, max_nlls])
     ax.set_ylim(bottom=0.05, top=1.02)
+    fig.tight_layout(pad=2.0)
     fig.savefig(fname=plot_output_path, dpi=150)
 
     os.remove('/tmp/tmp_bootstrap_gt.json')

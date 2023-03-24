@@ -76,12 +76,12 @@ def generate_count_curve(
     if plot_title:
         fig, ax = plt.subplots(figsize=[20, 9])
         ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
-        ins.set_xlim([0.65, 1.0])
         ins.set_xticks(
             [.7, .75, .8, .85, .9, .95],
             [.7, .75, .8, .85, .9, .95], fontsize=30,
         )
         ins.yaxis.tick_right()
+        ins.set_xlim([.7, 1.0])
         ins.xaxis.tick_top()
 
     for category_id in precision:
@@ -153,7 +153,7 @@ def generate_count_curve(
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
         ax.legend(
-            loc='center left', bbox_to_anchor=(.95, .75),
+            loc='center left', bbox_to_anchor=(.85, .4),
             fancybox=True, shadow=True, ncol=1, fontsize=25,
         )
 
@@ -169,8 +169,7 @@ def generate_count_curve(
         ins.tick_params(axis='both', which='major', labelsize=20)
 
         ax.set_ylim(bottom=0.05, top=1.02)
-        ax.set_xlim(np.min(rec), 1)
-
+        fig.tight_layout(pad=2.0)
         fig.savefig(plot_output_path, dpi=150)
     else:
         return precision, recall

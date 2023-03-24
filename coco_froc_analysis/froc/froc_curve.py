@@ -90,12 +90,12 @@ def generate_froc_curve(
     if plot_title:
         fig, ax = plt.subplots(figsize=[27, 10])
         ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
-        ins.set_xlim([0.1, 5.0])
         ins.set_xticks(
             [0.1, 1.0, 2.0, 3.0, 4.0], [
                 0.1, 1.0, 2.0, 3.0, 4.0,
             ], fontsize=30,
         )
+        ins.set_xlim([0.1, 4.5])
 
     for category_id in lls_accuracy:
         lls = lls_accuracy[category_id]
@@ -113,8 +113,6 @@ def generate_froc_curve(
                 'x--',
                 label='AI ' + stats[category_id]['name'],
             )
-
-            ax.set_xlim(np.min(nlls), np.max(nlls))
 
             if test_ann is not None:
                 for t_ann, c in zip(test_ann, COLORS):
@@ -168,7 +166,7 @@ def generate_froc_curve(
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
         ax.legend(
-            loc='center left', bbox_to_anchor=(.95, .75),
+            loc='center left', bbox_to_anchor=(.8, .6),
             fancybox=True, shadow=True, ncol=1, fontsize=25,
         )
 
@@ -180,6 +178,7 @@ def generate_froc_curve(
         ins.tick_params(axis='both', which='major', labelsize=20)
 
         ax.set_ylim(bottom=0.05, top=1.02)
+        fig.tight_layout(pad=2.0)
         fig.savefig(fname=plot_output_path, dpi=150)
     else:
         return lls_accuracy, nlls_per_image

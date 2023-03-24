@@ -36,10 +36,11 @@ def generate_bootstrap_count_curves(
 
     fig, ax = plt.subplots(figsize=[20, 9])
     ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
-    ins.set_xlim([0.8, 1.0])
     ins.set_xticks([.85, .9, .95], [.85, .9, .95], fontsize=30)
     ins.yaxis.tick_right()
     ins.xaxis.tick_top()
+
+    ins.set_xlim([.7, 1.0])
 
     collected_rocs = {'precision': {}, 'recall': {}}
 
@@ -199,10 +200,6 @@ def generate_bootstrap_count_curves(
             alpha=.2,
         )
 
-        for rec, prec in zip(all_rec, all_prec):
-            ax.plot(rec, prec, 'r-', alpha=.1)
-            ins.plot(rec, prec, 'r-', alpha=.1)
-
         if test_ann is not None:
             for t_ann, c in zip(test_ann, COLORS):
                 t_ann, label = t_ann
@@ -253,7 +250,7 @@ def generate_bootstrap_count_curves(
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(
-        loc='center left', bbox_to_anchor=(.95, .75),
+        loc='center left', bbox_to_anchor=(.85, .4),
         fancybox=True, shadow=True, ncol=1, fontsize=25,
     )
 
@@ -269,8 +266,7 @@ def generate_bootstrap_count_curves(
     ins.tick_params(axis='both', which='major', labelsize=20)
 
     ax.set_ylim(bottom=0.05, top=1.02)
-    ax.set_xlim(min_rec, 1.0)
-
+    fig.tight_layout(pad=2.0)
     fig.savefig(plot_output_path, dpi=150)
 
     os.remove('/tmp/tmp_bootstrap_gt.json')
