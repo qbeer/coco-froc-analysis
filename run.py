@@ -6,6 +6,8 @@ from coco_froc_analysis.count import generate_bootstrap_count_curves
 from coco_froc_analysis.count import generate_count_curve
 from coco_froc_analysis.froc import generate_bootstrap_froc_curves
 from coco_froc_analysis.froc import generate_froc_curve
+from coco_froc_analysis.utils import bounds
+from coco_froc_analysis.utils import test_point
 
 
 def run():
@@ -43,7 +45,9 @@ def run():
     parser.add_argument(
         '--test_ann',
         action='append',
-        help='Extra ground-truth like annotations',
+        help='Extra ground-truth like annotations with annotator name/ID.',
+        type=test_point,
+        dest='test_ann',
         required=False,
     )
 
@@ -57,6 +61,13 @@ def run():
         '--weighted',
         default=False,
         action='store_true',
+    )
+
+    parser.add_argument(
+        '--bounds',
+        type=bounds,
+        default=None,
+        required=False,
     )
 
     args = parser.parse_args()

@@ -46,20 +46,61 @@ The FROC analysis counts the number of images, number of lesions in the ground t
 ## Usage
 
 ```python
-from froc_analysis import generate_froc_curve, generate_bootstrap_curves
+from coco_froc_analysis.count import generate_bootstrap_count_curves
+from coco_froc_analysis.count import generate_count_curve
+from coco_froc_analysis.froc import generate_bootstrap_froc_curves
+from coco_froc_analysis.froc import generate_froc_curve
 
 # For single FROC curve
-generate_froc_curve(gt_ann='<path-to-your-ground-thruth-annotation-file>',
-                    pr_ann='<path-to-Detectron2-or-mmdetection-prediction-file>',
-                    use_iou=False, iou_thres=.5, n_sample_points=75,
-                    plot_title='FROC', plot_output_path='froc.png')
+generate_froc_curve(
+            gt_ann=args.gt_ann,
+            pr_ann=args.pr_ann,
+            use_iou=args.use_iou,
+            iou_thres=args.iou_thres,
+            n_sample_points=args.n_sample_points,
+            plot_title='FROC' if args.plot_title is None else args.plot_title,
+            plot_output_path='froc.png' if args.plot_output_path is None else args.plot_output_path,
+            test_ann=args.test_ann,
+        )
 
 # For bootstrapped curves
-generate_bootstrap_curves(gt_ann='<path-to-your-ground-thruth-annotation-file>',
-                          pr_ann='<path-to-Detectron2-or-mmdetection-prediction-file>',
-                          n_bootstrap_samples=5,
-                          use_iou=False, iou_thres=.5, n_sample_points=25,
-                          plot_title='FROC', plot_output_path='froc.png')
+generate_bootstrap_froc_curves(
+            gt_ann=args.gt_ann,
+            pr_ann=args.pr_ann,
+            n_bootstrap_samples=args.bootstrap,
+            use_iou=args.use_iou,
+            iou_thres=args.iou_thres,
+            n_sample_points=args.n_sample_points,
+            plot_title='FROC (bootstrap)' if args.plot_title is None else args.plot_title,
+            plot_output_path='froc_bootstrap.png' if args.plot_output_path is None else args.plot_output_path,
+            test_ann=args.test_ann,
+        )
+```
+
+Please check `run.py` for more details. The `IoU` part of this code is not reliable and currently the codebase only works for binary evaluation, but any multiclass problem could be chunked up to work with it.
+
+Description of `run.py` arguments:
+
+```bash
+usage: run.py [-h] [--bootstrap BOOTSTRAP] --gt_ann GT_ANN --pr_ann PR_ANN [--use_iou] [--iou_thres IOU_THRES] [--n_sample_points N_SAMPLE_POINTS]
+              [--plot_title PLOT_TITLE] [--plot_output_path PLOT_OUTPUT_PATH] [--test_ann TEST_ANN] [--counts] [--weighted]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --bootstrap BOOTSTRAP
+                        Whether to do a single or bootstrap runs.
+  --gt_ann GT_ANN
+  --pr_ann PR_ANN
+  --use_iou             Use IoU score to decide based on `proximity`
+  --iou_thres IOU_THRES
+                        If IoU score is used the default threshold is set to .5
+  --n_sample_points N_SAMPLE_POINTS
+                        Number of points to evaluate the FROC curve at.
+  --plot_title PLOT_TITLE
+  --plot_output_path PLOT_OUTPUT_PATH
+  --test_ann TEST_ANN   Extra ground-truth like annotations
+  --counts
+  --weighted
 ```
 
 ## CLI Usage

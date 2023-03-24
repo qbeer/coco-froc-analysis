@@ -63,6 +63,7 @@ def generate_count_curve(
     plot_title='Count curve',
     plot_output_path='counts.png',
     test_ann=None,
+    bounds=None,
 ):
     precision = {}
     recall = {}
@@ -76,13 +77,17 @@ def generate_count_curve(
     if plot_title:
         fig, ax = plt.subplots(figsize=[20, 9])
         ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
-        ins.set_xlim([0.65, 1.0])
         ins.set_xticks(
             [.7, .75, .8, .85, .9, .95],
             [.7, .75, .8, .85, .9, .95], fontsize=30,
         )
         ins.yaxis.tick_right()
         ins.xaxis.tick_top()
+        if bounds is not None:
+            _, x_max, _, _ = bounds
+            ins.set_xlim([.8, x_max])
+        else:
+            ins.set_xlim([.8, 1.0])
 
     for category_id in precision:
         prec = precision[category_id]
@@ -153,7 +158,7 @@ def generate_count_curve(
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
         ax.legend(
-            loc='center left', bbox_to_anchor=(.95, .75),
+            loc='center left', bbox_to_anchor=(.85, .4),
             fancybox=True, shadow=True, ncol=1, fontsize=25,
         )
 
@@ -168,9 +173,13 @@ def generate_count_curve(
         ax.tick_params(axis='both', which='major', labelsize=30)
         ins.tick_params(axis='both', which='major', labelsize=20)
 
-        ax.set_ylim(bottom=0.05, top=1.02)
-        ax.set_xlim(np.min(rec), 1)
-
+        if bounds is not None:
+            x_min, x_max, _, _ = bounds
+            ax.set_xlim([x_min, x_max])
+        else:
+            ax.set_xlim([.7, 1.0])
+            ax.set_ylim(bottom=0.05, top=1.02)
+        fig.tight_layout(pad=2.0)
         fig.savefig(plot_output_path, dpi=150)
     else:
         return precision, recall

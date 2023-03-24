@@ -73,6 +73,7 @@ def generate_froc_curve(
     plot_title='FROC curve',
     plot_output_path='froc.png',
     test_ann=None,
+    bounds=None,
 ):
 
     lls_accuracy = {}
@@ -90,12 +91,17 @@ def generate_froc_curve(
     if plot_title:
         fig, ax = plt.subplots(figsize=[27, 10])
         ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
-        ins.set_xlim([0.1, 5.0])
         ins.set_xticks(
             [0.1, 1.0, 2.0, 3.0, 4.0], [
                 0.1, 1.0, 2.0, 3.0, 4.0,
             ], fontsize=30,
         )
+
+        if bounds is not None:
+            _, x_max, _, y_max = bounds
+            ins.set_xlim([.1, x_max])
+        else:
+            ins.set_xlim([0.1, 4.5])
 
     for category_id in lls_accuracy:
         lls = lls_accuracy[category_id]
@@ -113,8 +119,6 @@ def generate_froc_curve(
                 'x--',
                 label='AI ' + stats[category_id]['name'],
             )
-
-            ax.set_xlim(np.min(nlls), np.max(nlls))
 
             if test_ann is not None:
                 for t_ann, c in zip(test_ann, COLORS):
@@ -168,7 +172,7 @@ def generate_froc_curve(
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
         ax.legend(
-            loc='center left', bbox_to_anchor=(.95, .75),
+            loc='center left', bbox_to_anchor=(.8, .6),
             fancybox=True, shadow=True, ncol=1, fontsize=25,
         )
 
@@ -179,7 +183,13 @@ def generate_froc_curve(
         ax.tick_params(axis='both', which='major', labelsize=30)
         ins.tick_params(axis='both', which='major', labelsize=20)
 
-        ax.set_ylim(bottom=0.05, top=1.02)
+        if bounds is not None:
+            x_min, x_max, y_min, y_max = bounds
+            ax.set_ylim([y_min, y_max])
+            ax.set_xlim([x_min, x_max])
+        else:
+            ax.set_ylim(bottom=0.05, top=1.02)
+        fig.tight_layout(pad=2.0)
         fig.savefig(fname=plot_output_path, dpi=150)
     else:
         return lls_accuracy, nlls_per_image

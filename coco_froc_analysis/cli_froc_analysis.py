@@ -1,23 +1,13 @@
 from __future__ import annotations
 
 import argparse
-import random
-import string
 
 from .count import generate_bootstrap_count_curves
 from .count import generate_count_curve
 from .froc import generate_bootstrap_froc_curves
 from .froc import generate_froc_curve
-
-
-def test_point(val):
-    try:
-        json_file, annotator = val.split(',')
-        return json_file, annotator
-    except ValueError:
-        print('assigning random annotator ID')
-        letters = string.ascii_lowercase
-        return val, 'test_' + ''.join(random.choice(letters) for _ in range(3))
+from .utils import bounds
+from .utils import test_point
 
 
 def run():
@@ -73,6 +63,13 @@ def run():
         action='store_true',
     )
 
+    parser.add_argument(
+        '--bounds',
+        type=bounds,
+        default=None,
+        required=False,
+    )
+
     args = parser.parse_args()
 
     if args.counts:
@@ -86,6 +83,7 @@ def run():
                 plot_output_path='counts_bootstrap.png' if args.plot_output_path is None else args.plot_output_path,
                 weighted=args.weighted,
                 test_ann=args.test_ann,
+                bounds=args.bounds,
             )
         else:
             generate_count_curve(
@@ -95,6 +93,7 @@ def run():
                 plot_title='Counts PR' if args.plot_title is None else args.plot_title,
                 plot_output_path='counts.png' if args.plot_output_path is None else args.plot_output_path,
                 test_ann=args.test_ann,
+                bounds=args.bounds,
             )
 
         exit(-1)
@@ -111,6 +110,7 @@ def run():
             plot_title='FROC (bootstrap)' if args.plot_title is None else args.plot_title,
             plot_output_path='froc_bootstrap.png' if args.plot_output_path is None else args.plot_output_path,
             test_ann=args.test_ann,
+            bounds=args.bounds,
         )
     else:
         print('Generating single FROC curve...')
@@ -123,4 +123,5 @@ def run():
             plot_title='FROC' if args.plot_title is None else args.plot_title,
             plot_output_path='froc.png' if args.plot_output_path is None else args.plot_output_path,
             test_ann=args.test_ann,
+            bounds=args.bounds,
         )

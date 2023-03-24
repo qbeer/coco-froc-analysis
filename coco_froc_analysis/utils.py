@@ -1,12 +1,35 @@
 from __future__ import annotations
 
+import argparse
 import json
+import random
+import string
 from pathlib import Path
 
 COLORS = [
     'r', 'g', 'm', 'y', 'teal', 'magenta',
     'royalblue', 'lime', 'forestgreen',
 ]
+
+
+def test_point(val):
+    try:
+        json_file, annotator = val.split(',')
+        return json_file, annotator
+    except ValueError:
+        print('assigning random annotator ID')
+        letters = string.ascii_lowercase
+        return val, 'test_' + ''.join(random.choice(letters) for _ in range(3))
+
+
+def bounds(val):
+    try:
+        x_min, x_max, y_min, y_max = val.split(',')
+        return float(x_min), float(x_max), float(y_min), float(y_max)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            'axis bounds must be four comma separated floats, (x_min, x_max, y_min, y_max)',
+        )
 
 
 def transform_gt_into_pr(
