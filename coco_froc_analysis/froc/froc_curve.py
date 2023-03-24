@@ -73,6 +73,7 @@ def generate_froc_curve(
     plot_title='FROC curve',
     plot_output_path='froc.png',
     test_ann=None,
+    bounds=None,
 ):
 
     lls_accuracy = {}
@@ -95,7 +96,12 @@ def generate_froc_curve(
                 0.1, 1.0, 2.0, 3.0, 4.0,
             ], fontsize=30,
         )
-        ins.set_xlim([0.1, 4.5])
+
+        if bounds is not None:
+            _, x_max, _, y_max = bounds
+            ins.set_xlim([.1, x_max])
+        else:
+            ins.set_xlim([0.1, 4.5])
 
     for category_id in lls_accuracy:
         lls = lls_accuracy[category_id]
@@ -177,7 +183,12 @@ def generate_froc_curve(
         ax.tick_params(axis='both', which='major', labelsize=30)
         ins.tick_params(axis='both', which='major', labelsize=20)
 
-        ax.set_ylim(bottom=0.05, top=1.02)
+        if bounds is not None:
+            x_min, x_max, y_min, y_max = bounds
+            ax.set_ylim([y_min, y_max])
+            ax.set_xlim([x_min, x_max])
+        else:
+            ax.set_ylim(bottom=0.05, top=1.02)
         fig.tight_layout(pad=2.0)
         fig.savefig(fname=plot_output_path, dpi=150)
     else:

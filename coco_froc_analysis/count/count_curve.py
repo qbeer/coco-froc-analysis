@@ -63,6 +63,7 @@ def generate_count_curve(
     plot_title='Count curve',
     plot_output_path='counts.png',
     test_ann=None,
+    bounds=None,
 ):
     precision = {}
     recall = {}
@@ -81,8 +82,12 @@ def generate_count_curve(
             [.7, .75, .8, .85, .9, .95], fontsize=30,
         )
         ins.yaxis.tick_right()
-        ins.set_xlim([.7, 1.0])
         ins.xaxis.tick_top()
+        if bounds is not None:
+            _, x_max, _, _ = bounds
+            ins.set_xlim([.8, x_max])
+        else:
+            ins.set_xlim([.8, 1.0])
 
     for category_id in precision:
         prec = precision[category_id]
@@ -168,7 +173,12 @@ def generate_count_curve(
         ax.tick_params(axis='both', which='major', labelsize=30)
         ins.tick_params(axis='both', which='major', labelsize=20)
 
-        ax.set_ylim(bottom=0.05, top=1.02)
+        if bounds is not None:
+            x_min, x_max, _, _ = bounds
+            ax.set_xlim([x_min, x_max])
+        else:
+            ax.set_xlim([.7, 1.0])
+            ax.set_ylim(bottom=0.05, top=1.02)
         fig.tight_layout(pad=2.0)
         fig.savefig(plot_output_path, dpi=150)
     else:

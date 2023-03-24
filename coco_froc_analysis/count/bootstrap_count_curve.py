@@ -25,6 +25,7 @@ def generate_bootstrap_count_curves(
     plot_title='Count curve',
     plot_output_path='counts.png',
     test_ann=None,
+    bounds=None,
 ):
     with open(gt_ann) as fp:
         GT_ANN = json.load(fp)
@@ -40,7 +41,11 @@ def generate_bootstrap_count_curves(
     ins.yaxis.tick_right()
     ins.xaxis.tick_top()
 
-    ins.set_xlim([.7, 1.0])
+    if bounds is not None:
+        _, x_max, _, _ = bounds
+        ins.set_xlim([.8, x_max])
+    else:
+        ins.set_xlim([.8, 1.0])
 
     collected_rocs = {'precision': {}, 'recall': {}}
 
@@ -265,7 +270,12 @@ def generate_bootstrap_count_curves(
     ax.tick_params(axis='both', which='major', labelsize=30)
     ins.tick_params(axis='both', which='major', labelsize=20)
 
-    ax.set_ylim(bottom=0.05, top=1.02)
+    if bounds is not None:
+        x_min, x_max, _, _ = bounds
+        ax.set_xlim([x_min, x_max])
+    else:
+        ax.set_xlim([.7, 1.0])
+        ax.set_ylim(bottom=0.05, top=1.02)
     fig.tight_layout(pad=2.0)
     fig.savefig(plot_output_path, dpi=150)
 
