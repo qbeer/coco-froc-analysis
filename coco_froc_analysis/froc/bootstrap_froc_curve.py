@@ -36,7 +36,7 @@ def generate_bootstrap_froc_curves(
 
     n_images = len(GT_ANN['images'])
 
-    fig, ax = plt.subplots(figsize=[27, 10])
+    fig, ax = plt.subplots(figsize=[27, 18])
     ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
     ins.set_xticks(
         [0.1, 1.0, 2.0, 3.0, 4.0], [
@@ -44,11 +44,7 @@ def generate_bootstrap_froc_curves(
         ], fontsize=30,
     )
 
-    if bounds is not None:
-        _, x_max, _, y_max = bounds
-        ins.set_xlim([.1, x_max])
-    else:
-        ins.set_xlim([0.1, 4.5])
+    ins.set_xlim([.1, 4.5])
 
     collected_frocs = {'lls': {}, 'nlls': {}}
 
@@ -139,8 +135,11 @@ def generate_bootstrap_froc_curves(
         non_bootstrap_nlls[cat_id],
     )
 
+    if bounds is not None:
+        min_nlls, max_nlls = bounds[0], bounds[1]
+
     x_range = np.logspace(
-        np.log10(min_nlls + 1e-2), np.log10(max_nlls),
+        np.log10(min_nlls + 1e-8), np.log10(max_nlls),
         n_sample_points, endpoint=True,
     )
 
@@ -245,18 +244,24 @@ def generate_bootstrap_froc_curves(
                     linestyles='dashed',
                     colors=c,
                 )
-                ax.text(
-                    x=min_nlls, y=_lls_accuracy[cat_id][0] - 0.02,
-                    s=f' FP/image = {np.round(_nlls_per_image[cat_id][0], 2)}',
-                    fontdict={'fontsize': 20, 'fontweight': 'bold'},
-                )
+
+                if bounds is not None:
+                    min_rec, _ = bounds[0], bounds[1]
+                    if _nlls_per_image[cat_id][0] < min_rec:
+                        continue
+                else:
+                    ax.text(
+                        x=_nlls_per_image[cat_id][0], y=_lls_accuracy[cat_id][0],
+                        s=f' FP/image = {np.round(_nlls_per_image[cat_id][0], 2)}',
+                        fontdict={'fontsize': 20, 'fontweight': 'bold'},
+                    )
 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(
-        loc='center left', bbox_to_anchor=(.8, .6),
-        fancybox=True, shadow=True, ncol=1, fontsize=25,
+        loc='lower left', bbox_to_anchor=(.1, .1),
+        fancybox=True, shadow=True, ncol=1, fontsize=30,
     )
 
     ax.set_title(plot_title, fontdict={'fontsize': 35})
@@ -272,7 +277,7 @@ def generate_bootstrap_froc_curves(
         ax.set_xlim([x_min, x_max])
     else:
         ax.set_ylim(bottom=0.05, top=1.02)
-    fig.tight_layout(pad=2.0)
+    fig.tight_layout()
     fig.savefig(fname=plot_output_path, dpi=150)
 
     os.remove('/tmp/tmp_bootstrap_gt.json')

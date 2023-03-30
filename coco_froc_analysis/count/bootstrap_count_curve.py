@@ -35,7 +35,7 @@ def generate_bootstrap_count_curves(
 
     n_images = len(GT_ANN['images'])
 
-    fig, ax = plt.subplots(figsize=[20, 9])
+    fig, ax = plt.subplots(figsize=[27, 18])
     ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
     ins.set_xticks([.85, .9, .95], [.85, .9, .95], fontsize=30)
     ins.yaxis.tick_right()
@@ -140,6 +140,9 @@ def generate_bootstrap_count_curves(
             non_bootstrap_rec[cat_id],
         )
 
+        if bounds is not None:
+            min_rec, max_rec = bounds[0], bounds[1]
+
         x_range = np.linspace(min_rec, max_rec, n_sample_points, endpoint=True)
 
         rocs = []
@@ -233,20 +236,27 @@ def generate_bootstrap_count_curves(
                 )
                 ax.hlines(
                     y=_prec_accuracy[cat_id][0],
-                    xmin=np.min(all_rec),
-                    xmax=np.max(all_rec),
+                    xmin=.6,
+                    xmax=1.,
                     linestyles='dashed',
                     colors=c,
                 )
-                ax.text(
-                    x=min_rec, y=_prec_accuracy[cat_id][0] - 0.035,
-                    s=f' R = {np.round(_rec_per_image[cat_id][0], 3)}',
-                    fontdict={'fontsize': 20, 'fontweight': 'bold'},
-                )
+
+                if bounds is not None:
+                    min_rec, max_rec = bounds[0], bounds[1]
+                    if _rec_per_image[cat_id][0] < min_rec:
+                        continue
+                else:
+                    ax.text(
+                        x=_rec_per_image[cat_id][0], y=_prec_accuracy[cat_id][0],
+                        s=f' R = {np.round(_rec_per_image[cat_id][0], 3)}',
+                        fontdict={'fontsize': 20, 'fontweight': 'bold'},
+                    )
+
                 ins.hlines(
                     y=_prec_accuracy[cat_id][0],
-                    xmin=np.min(all_rec),
-                    xmax=np.max(all_rec),
+                    xmin=.6,
+                    xmax=1.,
                     linestyles='dashed',
                     colors=c,
                 )
@@ -255,8 +265,8 @@ def generate_bootstrap_count_curves(
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(
-        loc='center left', bbox_to_anchor=(.85, .4),
-        fancybox=True, shadow=True, ncol=1, fontsize=25,
+        loc='lower left', bbox_to_anchor=(.65, .1),
+        fancybox=True, shadow=True, ncol=1, fontsize=30,
     )
 
     ax.set_title(plot_title, fontdict={'fontsize': 35})
@@ -276,7 +286,7 @@ def generate_bootstrap_count_curves(
     else:
         ax.set_xlim([.7, 1.0])
         ax.set_ylim(bottom=0.05, top=1.02)
-    fig.tight_layout(pad=2.0)
+    fig.tight_layout()
     fig.savefig(plot_output_path, dpi=150)
 
     os.remove('/tmp/tmp_bootstrap_gt.json')

@@ -75,7 +75,7 @@ def generate_count_curve(
         precision, recall = calc_scores(stats, precision, recall)
 
     if plot_title:
-        fig, ax = plt.subplots(figsize=[20, 9])
+        fig, ax = plt.subplots(figsize=[27, 18])
         ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
         ins.set_xticks(
             [.7, .75, .8, .85, .9, .95],
@@ -141,7 +141,7 @@ def generate_count_curve(
                             colors=c,
                         )
                         ax.text(
-                            x=np.min(rec), y=_precision[category_id][0] - 0.035,
+                            x=_recall[category_id][0], y=_precision[category_id][0],
                             s=f' R = {np.round(_recall[category_id][0], 3)}',
                             fontdict={'fontsize': 20, 'fontweight': 'bold'},
                         )
@@ -158,8 +158,8 @@ def generate_count_curve(
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
         ax.legend(
-            loc='center left', bbox_to_anchor=(.85, .4),
-            fancybox=True, shadow=True, ncol=1, fontsize=25,
+            loc='lower left', bbox_to_anchor=(.65, .1),
+            fancybox=True, shadow=True, ncol=1, fontsize=30,
         )
 
         ax.set_title(plot_title, fontdict={'fontsize': 35})
@@ -179,7 +179,7 @@ def generate_count_curve(
         else:
             ax.set_xlim([.7, 1.0])
             ax.set_ylim(bottom=0.05, top=1.02)
-        fig.tight_layout(pad=2.0)
+        fig.tight_layout()
         fig.savefig(plot_output_path, dpi=150)
     else:
         return precision, recall

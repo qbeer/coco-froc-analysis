@@ -89,7 +89,7 @@ def generate_froc_curve(
         )
 
     if plot_title:
-        fig, ax = plt.subplots(figsize=[27, 10])
+        fig, ax = plt.subplots(figsize=[27, 18])
         ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
         ins.set_xticks(
             [0.1, 1.0, 2.0, 3.0, 4.0], [
@@ -162,7 +162,7 @@ def generate_froc_curve(
                             colors=c,
                         )
                         ax.text(
-                            x=np.min(nlls), y=_lls_accuracy[category_id][0] - 0.02,
+                            x=_nlls_per_image[category_id][0], y=_lls_accuracy[category_id][0],
                             s=f' FP/image = {np.round(_nlls_per_image[category_id][0], 2)}',
                             fontdict={'fontsize': 20, 'fontweight': 'bold'},
                         )
@@ -172,8 +172,8 @@ def generate_froc_curve(
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
         ax.legend(
-            loc='center left', bbox_to_anchor=(.8, .6),
-            fancybox=True, shadow=True, ncol=1, fontsize=25,
+            loc='lower left', bbox_to_anchor=(.1, .1),
+            fancybox=True, shadow=True, ncol=1, fontsize=30,
         )
 
         ax.set_title(plot_title, fontdict={'fontsize': 35})
@@ -189,7 +189,7 @@ def generate_froc_curve(
             ax.set_xlim([x_min, x_max])
         else:
             ax.set_ylim(bottom=0.05, top=1.02)
-        fig.tight_layout(pad=2.0)
+        fig.tight_layout()
         fig.savefig(fname=plot_output_path, dpi=150)
     else:
         return lls_accuracy, nlls_per_image
