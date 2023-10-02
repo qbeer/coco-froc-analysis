@@ -234,14 +234,7 @@ def generate_bootstrap_count_curves(
                     f' (R = {np.round(_rec_per_image[cat_id][0], 3)})',
                     c=c,
                 )
-                ax.hlines(
-                    y=_prec_accuracy[cat_id][0],
-                    xmin=.6,
-                    xmax=1.,
-                    linestyles='dashed',
-                    colors=c,
-                )
-
+                
                 if bounds is not None:
                     min_rec, max_rec = bounds[0], bounds[1]
                     if _rec_per_image[cat_id][0] < min_rec:
@@ -252,11 +245,19 @@ def generate_bootstrap_count_curves(
                         s=f' R = {np.round(_rec_per_image[cat_id][0], 3)}',
                         fontdict={'fontsize': 20, 'fontweight': 'bold'},
                     )
+                
+                ax.hlines(
+                    y=_prec_accuracy[cat_id][0],
+                    xmin=min_rec,
+                    xmax=max_rec,
+                    linestyles='dashed',
+                    colors=c,
+                )
 
                 ins.hlines(
                     y=_prec_accuracy[cat_id][0],
-                    xmin=.6,
-                    xmax=1.,
+                    xmin=min_rec,
+                    xmax=max_rec,
                     linestyles='dashed',
                     colors=c,
                 )
@@ -286,6 +287,8 @@ def generate_bootstrap_count_curves(
     else:
         ax.set_xlim([.7, 1.0])
         ax.set_ylim(bottom=0.05, top=1.02)
+
+    ax.grid(True, which='both', axis='both', alpha=.5, linestyle='--')
     fig.tight_layout()
     fig.savefig(plot_output_path, dpi=150)
 
