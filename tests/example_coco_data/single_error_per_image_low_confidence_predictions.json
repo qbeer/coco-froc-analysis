@@ -1,66 +1,4 @@
-{"images": [
-        {
-            "id": 59123,
-            "dataset_id": 25,
-            "category_ids": [],
-            "path": "/datasets/face-mask/face-mask.jpg",
-            "width": 960,
-            "height": 540,
-            "file_name": "face-mask.jpg",
-            "annotated": false,
-            "annotating": [],
-            "num_annotations": 0,
-            "metadata": {},
-            "deleted": false,
-            "milliseconds": 0,
-            "events": [],
-            "regenerate_thumbnail": false
-        },
-        {
-            "id": 59124,
-            "dataset_id": 25,
-            "category_ids": [],
-            "path": "/datasets/face-mask/face-mask-2.jpeg",
-            "width": 269,
-            "height": 187,
-            "file_name": "face-mask-2.jpeg",
-            "annotated": false,
-            "annotating": [],
-            "num_annotations": 0,
-            "metadata": {},
-            "deleted": false,
-            "milliseconds": 0,
-            "events": [],
-            "regenerate_thumbnail": false
-        },
-        {
-            "id": 59125,
-            "dataset_id": 25,
-            "category_ids": [],
-            "path": "/datasets/face-mask/gettyimages-face-mask-public-covid-19.jpg",
-            "width": 724,
-            "height": 483,
-            "file_name": "gettyimages-face-mask-public-covid-19.jpg",
-            "annotated": false,
-            "annotating": [],
-            "num_annotations": 0,
-            "metadata": {},
-            "deleted": false,
-            "milliseconds": 0,
-            "events": [],
-            "regenerate_thumbnail": false
-        }
-    ],"categories": [
-        {
-            "id": 8,
-            "name": "face-mask",
-            "supercategory": "",
-            "color": "#2d9bae",
-            "metadata": {},
-            "keypoint_colors": []
-        }
-    ],
-       "annotations": [
+[
     {
         "id": 244328,
         "image_id": 59123,
@@ -265,4 +203,3 @@
         "metadata": {}
     }
 ]
-}
