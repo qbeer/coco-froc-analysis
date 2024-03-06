@@ -106,18 +106,87 @@ def generate_froc_curve(
     for category_id in lls_accuracy:
         lls = lls_accuracy[category_id]
         nlls = nlls_per_image[category_id]
-        if plot_title:
+        if plot_title and np.all(np.array(nlls) > 0):
             ax.semilogx(
                 nlls,
                 lls,
-                'x--',
+                'D--',
                 label='AI ' + stats[category_id]['name'],
+                linewidth=4,
+                markersize=25,
             )
             ins.plot(
                 nlls,
                 lls,
-                'x--',
+                'D--',
                 label='AI ' + stats[category_id]['name'],
+                linewidth=4,
+                markersize=25,
+            )
+
+            if test_ann is not None:
+                for t_ann, c in zip(test_ann, COLORS):
+                    t_ann, label = t_ann
+                    t_pr = transform_gt_into_pr(t_ann, gt_ann)
+                    stats = froc_point(gt_ann, t_pr, .5, use_iou, iou_thres)
+                    _lls_accuracy, _nlls_per_image = calc_scores(stats, {}, {})
+                    if plot_title:
+                        ax.plot(
+                            _nlls_per_image[category_id][0],
+                            _lls_accuracy[category_id][0],
+                            'D',
+                            markersize=15,
+                            markeredgewidth=3,
+                            label=label +
+                            f' (FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
+                            c=c,
+                        )
+                        ins.plot(
+                            _nlls_per_image[category_id][0],
+                            _lls_accuracy[category_id][0],
+                            'D',
+                            markersize=12,
+                            markeredgewidth=2,
+                            label=label +
+                            f' (FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
+                            c=c,
+                        )
+                        ax.hlines(
+                            y=_lls_accuracy[category_id][0],
+                            xmin=np.min(nlls),
+                            xmax=np.max(nlls),
+                            linestyles='dashed',
+                            colors=c,
+                        )
+                        ins.hlines(
+                            y=_lls_accuracy[category_id][0],
+                            xmin=np.min(nlls),
+                            xmax=np.max(nlls),
+                            linestyles='dashed',
+                            colors=c,
+                        )
+                        ax.text(
+                            x=_nlls_per_image[category_id][0], y=_lls_accuracy[category_id][0],
+                            s=f' FP/image = {np.round(_nlls_per_image[category_id][0], 2)}',
+                            fontdict={'fontsize': 20, 'fontweight': 'bold'},
+                        )
+        else:
+
+            ax.plot(
+                nlls,
+                lls,
+                'D--',
+                label='AI ' + stats[category_id]['name'],
+                linewidth=4,
+                markersize=25,
+            )
+            ins.plot(
+                nlls,
+                lls,
+                'D--',
+                label='AI ' + stats[category_id]['name'],
+                linewidth=4,
+                markersize=25,
             )
 
             if test_ann is not None:
@@ -188,8 +257,9 @@ def generate_froc_curve(
             ax.set_ylim([y_min, y_max])
             ax.set_xlim([x_min, x_max])
         else:
-            ax.set_ylim(bottom=0.05, top=1.02)
+            ax.set_ylim(bottom=-0.05, top=1.2)
         fig.tight_layout()
         fig.savefig(fname=plot_output_path, dpi=150)
+
     else:
         return lls_accuracy, nlls_per_image
