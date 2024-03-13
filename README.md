@@ -127,12 +127,54 @@ By default centroid closeness is used, if the `--use_iou` flag is set, `--iou_th
 
 ## For developers
 
+### Installing
+
+In order to develop this repository you are in need of `poetry`. To install the latest version of `poetry` please run:
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+After that you can install the dependencies by running:
+
+```bash
+poetry install
+```
+
+This will install the dependencies and the package in the virtual environment that you can activate by running:
+
+```bash
+poetry shell
+```
+
+In order to have checks ready before pushing you should also install `pre-commit`:
+
+```bash
+pre-commit install
+```
+
 ### Running tests
 
 ```bash
 python -m coverage run -m unittest discover --pattern "*_test.py" -v
 python -m coverage report -m
 ```
+
+### Testing GitHub Actions locally
+
+Install `act` following the instructions [here](https://nektosact.com/installation/index.html).
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+```
+
+Then you can run the GitHub Actions locally by running:
+
+```bash
+act
+```
+
+This will always fail at the last step because the repository needs the `CODECOV_TOKEN` to be set in the repository secrets. This is not present locally, but this is not an ERROR.
 
 ### Building and publishing (reminder)
 

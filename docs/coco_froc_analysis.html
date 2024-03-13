@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.3.0"/>
+    <meta name="generator" content="pdoc 12.3.1"/>
     <title>coco_froc_analysis API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -59,7 +59,7 @@ coco_froc_analysis    </h1>
 <h3 id="installation">Installation</h3>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code>pip install coco-froc-analysis
+<pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>coco-froc-analysis
 </code></pre>
 </div>
 
@@ -68,33 +68,33 @@ coco_froc_analysis    </h1>
 <p>A single annotation record in the ground-truth file might look like this:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;area&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2120</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;iscrowd&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">111</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">53</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">],</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;category_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;ignore&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;segmentation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;image_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">407</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">945</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;area&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2120</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;iscrowd&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">111</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">53</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;category_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;ignore&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;segmentation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">&quot;image_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">407</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">945</span>
+<span class="p">}</span>
 </code></pre>
 </div>
 
 <p>While the prediction (here for bounding box) given by the region detection framework is such:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;image_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">407</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;category_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.9990422129631042</span><span class="p">,</span><span class="w"></span>
-<span class="w">  </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
-<span class="w">    </span><span class="mf">110.72555541992188</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="mf">13.9161834716797</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="mf">49.4566650390625</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="mf">36.65155029296875</span><span class="w"></span>
-<span class="w">  </span><span class="p">]</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;image_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">407</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;category_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.9990422129631042</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="mf">110.72555541992188</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">13.9161834716797</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">49.4566650390625</span><span class="p">,</span>
+<span class="w">    </span><span class="mf">36.65155029296875</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
 </code></pre>
 </div>
 
@@ -140,46 +140,46 @@ coco_froc_analysis    </h1>
 <p>Description of <code>run.py</code> arguments:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code>usage: run.py <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>--bootstrap BOOTSTRAP<span class="o">]</span> --gt_ann GT_ANN --pr_ann PR_ANN <span class="o">[</span>--use_iou<span class="o">]</span> <span class="o">[</span>--iou_thres IOU_THRES<span class="o">]</span> <span class="o">[</span>--n_sample_points N_SAMPLE_POINTS<span class="o">]</span>
-              <span class="o">[</span>--plot_title PLOT_TITLE<span class="o">]</span> <span class="o">[</span>--plot_output_path PLOT_OUTPUT_PATH<span class="o">]</span> <span class="o">[</span>--test_ann TEST_ANN<span class="o">]</span> <span class="o">[</span>--counts<span class="o">]</span> <span class="o">[</span>--weighted<span class="o">]</span>
+<pre><span></span><code>usage:<span class="w"> </span>run.py<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>--bootstrap<span class="w"> </span>BOOTSTRAP<span class="o">]</span><span class="w"> </span>--gt_ann<span class="w"> </span>GT_ANN<span class="w"> </span>--pr_ann<span class="w"> </span>PR_ANN<span class="w"> </span><span class="o">[</span>--use_iou<span class="o">]</span><span class="w"> </span><span class="o">[</span>--iou_thres<span class="w"> </span>IOU_THRES<span class="o">]</span><span class="w"> </span><span class="o">[</span>--n_sample_points<span class="w"> </span>N_SAMPLE_POINTS<span class="o">]</span>
+<span class="w">              </span><span class="o">[</span>--plot_title<span class="w"> </span>PLOT_TITLE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--plot_output_path<span class="w"> </span>PLOT_OUTPUT_PATH<span class="o">]</span><span class="w"> </span><span class="o">[</span>--test_ann<span class="w"> </span>TEST_ANN<span class="o">]</span><span class="w"> </span><span class="o">[</span>--counts<span class="o">]</span><span class="w"> </span><span class="o">[</span>--weighted<span class="o">]</span>
 
-optional arguments:
-  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
-  --bootstrap BOOTSTRAP
-                        Whether to <span class="k">do</span> a single or bootstrap runs.
-  --gt_ann GT_ANN
-  --pr_ann PR_ANN
-  --use_iou             Use IoU score to decide based on <span class="sb">`</span>proximity<span class="sb">`</span>
-  --iou_thres IOU_THRES
-                        If IoU score is used the default threshold is <span class="nb">set</span> to .5
-  --n_sample_points N_SAMPLE_POINTS
-                        Number of points to evaluate the FROC curve at.
-  --plot_title PLOT_TITLE
-  --plot_output_path PLOT_OUTPUT_PATH
-  --test_ann TEST_ANN   Extra ground-truth like annotations
-  --counts
-  --weighted
+optional<span class="w"> </span>arguments:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">            </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>--bootstrap<span class="w"> </span>BOOTSTRAP
+<span class="w">                        </span>Whether<span class="w"> </span>to<span class="w"> </span><span class="k">do</span><span class="w"> </span>a<span class="w"> </span>single<span class="w"> </span>or<span class="w"> </span>bootstrap<span class="w"> </span>runs.
+<span class="w">  </span>--gt_ann<span class="w"> </span>GT_ANN
+<span class="w">  </span>--pr_ann<span class="w"> </span>PR_ANN
+<span class="w">  </span>--use_iou<span class="w">             </span>Use<span class="w"> </span>IoU<span class="w"> </span>score<span class="w"> </span>to<span class="w"> </span>decide<span class="w"> </span>based<span class="w"> </span>on<span class="w"> </span><span class="sb">`</span>proximity<span class="sb">`</span>
+<span class="w">  </span>--iou_thres<span class="w"> </span>IOU_THRES
+<span class="w">                        </span>If<span class="w"> </span>IoU<span class="w"> </span>score<span class="w"> </span>is<span class="w"> </span>used<span class="w"> </span>the<span class="w"> </span>default<span class="w"> </span>threshold<span class="w"> </span>is<span class="w"> </span><span class="nb">set</span><span class="w"> </span>to<span class="w"> </span>.5
+<span class="w">  </span>--n_sample_points<span class="w"> </span>N_SAMPLE_POINTS
+<span class="w">                        </span>Number<span class="w"> </span>of<span class="w"> </span>points<span class="w"> </span>to<span class="w"> </span>evaluate<span class="w"> </span>the<span class="w"> </span>FROC<span class="w"> </span>curve<span class="w"> </span>at.
+<span class="w">  </span>--plot_title<span class="w"> </span>PLOT_TITLE
+<span class="w">  </span>--plot_output_path<span class="w"> </span>PLOT_OUTPUT_PATH
+<span class="w">  </span>--test_ann<span class="w"> </span>TEST_ANN<span class="w">   </span>Extra<span class="w"> </span>ground-truth<span class="w"> </span>like<span class="w"> </span>annotations
+<span class="w">  </span>--counts
+<span class="w">  </span>--weighted
 </code></pre>
 </div>
 
 <h2 id="cli-usage">CLI Usage</h2>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code>python -m coco_froc_analysis <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>--bootstrap N_BOOTSTRAP_ROUNDS<span class="o">]</span> --gt_ann GT_ANN --pred_ann PRED_ANN <span class="o">[</span>--use_iou<span class="o">]</span> <span class="o">[</span>--iou_thres IOU_THRES<span class="o">]</span> <span class="o">[</span>--n_sample_points N_SAMPLE_POINTS<span class="o">]</span>
-                        <span class="o">[</span>--plot_title PLOT_TITLE<span class="o">]</span> <span class="o">[</span>--plot_output_path PLOT_OUTPUT_PATH<span class="o">]</span>
+<pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>coco_froc_analysis<span class="w"> </span><span class="o">[</span>-h<span class="o">]</span><span class="w"> </span><span class="o">[</span>--bootstrap<span class="w"> </span>N_BOOTSTRAP_ROUNDS<span class="o">]</span><span class="w"> </span>--gt_ann<span class="w"> </span>GT_ANN<span class="w"> </span>--pred_ann<span class="w"> </span>PRED_ANN<span class="w"> </span><span class="o">[</span>--use_iou<span class="o">]</span><span class="w"> </span><span class="o">[</span>--iou_thres<span class="w"> </span>IOU_THRES<span class="o">]</span><span class="w"> </span><span class="o">[</span>--n_sample_points<span class="w"> </span>N_SAMPLE_POINTS<span class="o">]</span>
+<span class="w">                        </span><span class="o">[</span>--plot_title<span class="w"> </span>PLOT_TITLE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--plot_output_path<span class="w"> </span>PLOT_OUTPUT_PATH<span class="o">]</span>
 
-optional arguments:
-  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
-  --bootstrap  N_ROUNDS Whether to <span class="k">do</span> a single or bootstrap runs.
-  --gt_ann GT_ANN
-  --pred_ann PRED_ANN
-  --use_iou             Use IoU score to decide on <span class="sb">`</span>proximity<span class="sb">`</span> rather <span class="k">then</span> using center pixel inside GT box.
-  --iou_thres IOU_THRES
-                        If IoU score is used the default threshold is arbitrarily <span class="nb">set</span> to .5
-  --n_sample_points N_SAMPLE_POINTS
-                        Number of points to evaluate the FROC curve at.
-  --plot_title PLOT_TITLE
-  --plot_output_path PLOT_OUTPUT_PATH
+optional<span class="w"> </span>arguments:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">            </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>--bootstrap<span class="w">  </span>N_ROUNDS<span class="w"> </span>Whether<span class="w"> </span>to<span class="w"> </span><span class="k">do</span><span class="w"> </span>a<span class="w"> </span>single<span class="w"> </span>or<span class="w"> </span>bootstrap<span class="w"> </span>runs.
+<span class="w">  </span>--gt_ann<span class="w"> </span>GT_ANN
+<span class="w">  </span>--pred_ann<span class="w"> </span>PRED_ANN
+<span class="w">  </span>--use_iou<span class="w">             </span>Use<span class="w"> </span>IoU<span class="w"> </span>score<span class="w"> </span>to<span class="w"> </span>decide<span class="w"> </span>on<span class="w"> </span><span class="sb">`</span>proximity<span class="sb">`</span><span class="w"> </span>rather<span class="w"> </span><span class="k">then</span><span class="w"> </span>using<span class="w"> </span>center<span class="w"> </span>pixel<span class="w"> </span>inside<span class="w"> </span>GT<span class="w"> </span>box.
+<span class="w">  </span>--iou_thres<span class="w"> </span>IOU_THRES
+<span class="w">                        </span>If<span class="w"> </span>IoU<span class="w"> </span>score<span class="w"> </span>is<span class="w"> </span>used<span class="w"> </span>the<span class="w"> </span>default<span class="w"> </span>threshold<span class="w"> </span>is<span class="w"> </span>arbitrarily<span class="w"> </span><span class="nb">set</span><span class="w"> </span>to<span class="w"> </span>.5
+<span class="w">  </span>--n_sample_points<span class="w"> </span>N_SAMPLE_POINTS
+<span class="w">                        </span>Number<span class="w"> </span>of<span class="w"> </span>points<span class="w"> </span>to<span class="w"> </span>evaluate<span class="w"> </span>the<span class="w"> </span>FROC<span class="w"> </span>curve<span class="w"> </span>at.
+<span class="w">  </span>--plot_title<span class="w"> </span>PLOT_TITLE
+<span class="w">  </span>--plot_output_path<span class="w"> </span>PLOT_OUTPUT_PATH
 </code></pre>
 </div>
 
@@ -187,21 +187,69 @@ optional arguments:
 
 <h2 id="for-developers">For developers</h2>
 
+<h3 id="installing">Installing</h3>
+
+<p>In order to develop this repository you are in need of <code>poetry</code>. To install the latest version of <code>poetry</code> please run:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>curl<span class="w"> </span>-sSL<span class="w"> </span>https://install.python-poetry.org<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-
+</code></pre>
+</div>
+
+<p>After that you can install the dependencies by running:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>poetry<span class="w"> </span>install
+</code></pre>
+</div>
+
+<p>This will install the dependencies and the package in the virtual environment that you can activate by running:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>poetry<span class="w"> </span>shell
+</code></pre>
+</div>
+
+<p>In order to have checks ready before pushing you should also install <code>pre-commit</code>:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>pre-commit<span class="w"> </span>install
+</code></pre>
+</div>
+
 <h3 id="running-tests">Running tests</h3>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code>python -m coverage run -m unittest discover --pattern <span class="s2">&quot;*_test.py&quot;</span> -v
-python -m coverage report -m
+<pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>coverage<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>discover<span class="w"> </span>--pattern<span class="w"> </span><span class="s2">&quot;*_test.py&quot;</span><span class="w"> </span>-v
+python<span class="w"> </span>-m<span class="w"> </span>coverage<span class="w"> </span>report<span class="w"> </span>-m
 </code></pre>
 </div>
+
+<h3 id="testing-github-actions-locally">Testing GitHub Actions locally</h3>
+
+<p>Install <code>act</code> following the instructions <a href="https://nektosact.com/installation/index.html">here</a>.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>curl<span class="w"> </span>--proto<span class="w"> </span><span class="s1">&#39;=https&#39;</span><span class="w"> </span>--tlsv1.2<span class="w"> </span>-sSf<span class="w"> </span>https://raw.githubusercontent.com/nektos/act/master/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>bash
+</code></pre>
+</div>
+
+<p>Then you can run the GitHub Actions locally by running:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>act
+</code></pre>
+</div>
+
+<p>This will always fail at the last step because the repository needs the <code>CODECOV_TOKEN</code> to be set in the repository secrets. This is not present locally, but this is not an ERROR.</p>
 
 <h3 id="building-and-publishing-reminder">Building and publishing (reminder)</h3>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code>act <span class="c1"># for local CI pipeline</span>
-pdoc -d google coco_froc_analysis -o docs <span class="c1"># build docs</span>
-poetry version prerelease/patch <span class="c1"># test or actual release</span>
-poetry publish --build -r test-pypi <span class="c1"># or without -r test-pypi for publishing to pypi</span>
+<pre><span></span><code>act<span class="w"> </span><span class="c1"># for local CI pipeline</span>
+pdoc<span class="w"> </span>-d<span class="w"> </span>google<span class="w"> </span>coco_froc_analysis<span class="w"> </span>-o<span class="w"> </span>docs<span class="w"> </span><span class="c1"># build docs</span>
+poetry<span class="w"> </span>version<span class="w"> </span>prerelease/patch<span class="w"> </span><span class="c1"># test or actual release</span>
+poetry<span class="w"> </span>publish<span class="w"> </span>--build<span class="w"> </span>-r<span class="w"> </span>test-pypi<span class="w"> </span><span class="c1"># or without -r test-pypi for publishing to pypi</span>
 </code></pre>
 </div>
 
