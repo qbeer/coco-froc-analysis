@@ -176,13 +176,10 @@ act
 
 This will always fail at the last step because the repository needs the `CODECOV_TOKEN` to be set in the repository secrets. This is not present locally, but this is not an ERROR.
 
-### Building and publishing (reminder)
+### Creating documentation
 
 ```bash
-act # for local CI pipeline
 pdoc -d google coco_froc_analysis -o docs # build docs
-poetry version prerelease/patch # test or actual release
-poetry publish --build -r test-pypi # or without -r test-pypi for publishing to pypi
 ```
 
 @Regards, Alex
