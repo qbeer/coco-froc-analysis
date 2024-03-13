@@ -234,7 +234,7 @@ def generate_bootstrap_count_curves(
                     f' (R = {np.round(_rec_per_image[cat_id][0], 3)})',
                     c=c,
                 )
-                
+
                 if bounds is not None:
                     min_rec, max_rec = bounds[0], bounds[1]
                     if _rec_per_image[cat_id][0] < min_rec:
@@ -245,7 +245,7 @@ def generate_bootstrap_count_curves(
                         s=f' R = {np.round(_rec_per_image[cat_id][0], 3)}',
                         fontdict={'fontsize': 35, 'fontweight': 'bold'},
                     )
-                
+
                 ax.hlines(
                     y=_prec_accuracy[cat_id][0],
                     xmin=min_rec,

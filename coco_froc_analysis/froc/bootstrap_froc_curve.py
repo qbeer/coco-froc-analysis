@@ -277,9 +277,9 @@ def generate_bootstrap_froc_curves(
         ax.set_xlim([x_min, x_max])
     else:
         ax.set_ylim(bottom=0.05, top=1.02)
-    
+
     ax.grid(True, which='both', axis='both', alpha=.5, linestyle='--')
-    
+
     fig.tight_layout()
     fig.savefig(fname=plot_output_path, dpi=150)
 
