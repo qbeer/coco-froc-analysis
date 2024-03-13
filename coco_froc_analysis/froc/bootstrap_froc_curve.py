@@ -41,7 +41,7 @@ def generate_bootstrap_froc_curves(
     ins.set_xticks(
         [0.1, 1.0, 2.0, 3.0, 4.0], [
             0.1, 1.0, 2.0, 3.0, 4.0,
-        ], fontsize=30,
+        ], fontsize=45,
     )
 
     ins.set_xlim([.1, 4.5])
@@ -253,7 +253,7 @@ def generate_bootstrap_froc_curves(
                     ax.text(
                         x=_nlls_per_image[cat_id][0], y=_lls_accuracy[cat_id][0],
                         s=f' FP/image = {np.round(_nlls_per_image[cat_id][0], 2)}',
-                        fontdict={'fontsize': 20, 'fontweight': 'bold'},
+                        fontdict={'fontsize': 40, 'fontweight': 'bold'},
                     )
 
     box = ax.get_position()
@@ -261,15 +261,15 @@ def generate_bootstrap_froc_curves(
 
     ax.legend(
         loc='lower left', bbox_to_anchor=(.1, .1),
-        fancybox=True, shadow=True, ncol=1, fontsize=30,
+        fancybox=True, shadow=True, ncol=1, fontsize=45,
     )
 
-    ax.set_title(plot_title, fontdict={'fontsize': 35})
-    ax.set_ylabel('Sensitivity', fontdict={'fontsize': 30})
-    ax.set_xlabel('FP / image', fontdict={'fontsize': 30})
+    ax.set_title(plot_title, fontdict={'fontsize': 45})
+    ax.set_ylabel('Sensitivity', fontdict={'fontsize': 40})
+    ax.set_xlabel('FP / image', fontdict={'fontsize': 40})
 
-    ax.tick_params(axis='both', which='major', labelsize=30)
-    ins.tick_params(axis='both', which='major', labelsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=40)
+    ins.tick_params(axis='both', which='major', labelsize=35)
 
     if bounds is not None:
         x_min, x_max, y_min, y_max = bounds

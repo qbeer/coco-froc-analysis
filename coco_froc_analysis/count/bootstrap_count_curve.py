@@ -37,7 +37,7 @@ def generate_bootstrap_count_curves(
 
     fig, ax = plt.subplots(figsize=[27, 18])
     ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
-    ins.set_xticks([.85, .9, .95], [.85, .9, .95], fontsize=30)
+    ins.set_xticks([.85, .9, .95], [.85, .9, .95], fontsize=40)
     ins.yaxis.tick_right()
     ins.xaxis.tick_top()
 
@@ -243,7 +243,7 @@ def generate_bootstrap_count_curves(
                     ax.text(
                         x=_rec_per_image[cat_id][0], y=_prec_accuracy[cat_id][0],
                         s=f' R = {np.round(_rec_per_image[cat_id][0], 3)}',
-                        fontdict={'fontsize': 20, 'fontweight': 'bold'},
+                        fontdict={'fontsize': 35, 'fontweight': 'bold'},
                     )
                 
                 ax.hlines(
@@ -267,19 +267,19 @@ def generate_bootstrap_count_curves(
 
     ax.legend(
         loc='lower left', bbox_to_anchor=(.65, .1),
-        fancybox=True, shadow=True, ncol=1, fontsize=30,
+        fancybox=True, shadow=True, ncol=1, fontsize=40,
     )
 
-    ax.set_title(plot_title, fontdict={'fontsize': 35})
+    ax.set_title(plot_title, fontdict={'fontsize': 45})
     ax.set_ylabel(
         'Precision', fontdict={
-            'fontsize': 30,
+            'fontsize': 45,
         },
     )
-    ax.set_xlabel('Recall', fontdict={'fontsize': 30})
+    ax.set_xlabel('Recall', fontdict={'fontsize': 45})
 
-    ax.tick_params(axis='both', which='major', labelsize=30)
-    ins.tick_params(axis='both', which='major', labelsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=40)
+    ins.tick_params(axis='both', which='major', labelsize=40)
 
     if bounds is not None:
         x_min, x_max, _, _ = bounds
