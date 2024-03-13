@@ -38,6 +38,9 @@ jobs:
           name: codecov-umbrella
           fail_ci_if_error: true
           verbose: true
+      - name: Build package
+        run: |
+          poetry build
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
