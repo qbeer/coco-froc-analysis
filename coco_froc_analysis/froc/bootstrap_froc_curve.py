@@ -15,6 +15,8 @@ from .froc_curve import COLORS
 from .froc_curve import froc_point
 from .froc_curve import generate_froc_curve
 
+import pandas as pd
+
 
 def generate_bootstrap_froc_curves(
     gt_ann,
@@ -27,6 +29,7 @@ def generate_bootstrap_froc_curves(
     plot_output_path='froc_bootstrapped.png',
     test_ann=None,
     bounds=None,
+    csv_path=None,
 ):
     with open(gt_ann) as fp:
         GT_ANN = json.load(fp)
@@ -142,6 +145,20 @@ def generate_bootstrap_froc_curves(
         np.log10(min_nlls + 1e-8), np.log10(max_nlls),
         n_sample_points, endpoint=True,
     )
+    
+    if csv_path is not None:
+        alternative_froc = pd.read_csv(csv_path)
+        alternative_ll, alternative_nll = alternative_froc['lls'], alternative_froc['nlls']
+        alternative_ll_high, alternative_nll_high = alternative_froc['lls_high'], alternative_froc['nlls_high']
+        
+        alternative_ll = np.interp(alternative_nll_high, alternative_nll, alternative_ll)
+        alternative_ll_low = alternative_ll - (alternative_ll_high - alternative_ll)
+        
+        ax.semilogx(alternative_nll_high, alternative_ll, 'gx--', label='Alternative FROC')
+        ins.semilogx(alternative_nll_high, alternative_ll, 'gx--', label='Alternative FROC')
+        
+        ax.fill_between(alternative_nll_high, alternative_ll_low, alternative_ll_high, alpha=.2)
+        ins.fill_between(alternative_nll_high, alternative_ll_low, alternative_ll_high, alpha=.2)
 
     for cat_id in collected_frocs['lls']:
         all_lls = np.array(collected_frocs['lls'][cat_id]).reshape(
@@ -277,6 +294,10 @@ def generate_bootstrap_froc_curves(
         ax.set_xlim([x_min, x_max])
     else:
         ax.set_ylim(bottom=0.05, top=1.02)
+        
+    if csv_path is not None:
+        min_x, max_x = min(alternative_nll_high), max(alternative_nll_high)        
+        ax.set_xlim([min_x, max_x])
 
     ax.grid(True, which='both', axis='both', alpha=.5, linestyle='--')
 

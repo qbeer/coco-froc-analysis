@@ -13,6 +13,8 @@ from ..utils import update_scores
 from .froc_stats import init_stats
 from .froc_stats import update_stats
 
+import pandas as pd
+
 
 def froc_point(gt_ann, pr_ann, score_thres, use_iou, iou_thres):
     gt = load_json_from_file(gt_ann)
@@ -74,6 +76,7 @@ def generate_froc_curve(
     plot_output_path='froc.png',
     test_ann=None,
     bounds=None,
+    csv_path=None,
 ):
 
     lls_accuracy = {}
@@ -166,6 +169,20 @@ def generate_froc_curve(
                             s=f' FP/image = {np.round(_nlls_per_image[category_id][0], 2)}',
                             fontdict={'fontsize': 20, 'fontweight': 'bold'},
                         )
+                        
+    if csv_path is not None and plot_title is not None:
+        alternative_froc = pd.read_csv(csv_path)
+        alternative_ll, alternative_nll = alternative_froc['lls'], alternative_froc['nlls']
+        alternative_ll_high, alternative_nll_high = alternative_froc['lls_high'], alternative_froc['nlls_high']
+        
+        alternative_ll = np.interp(alternative_nll_high, alternative_nll, alternative_ll)
+        alternative_ll_low = alternative_ll - (alternative_ll_high - alternative_ll)
+        
+        ax.semilogx(alternative_nll_high, alternative_ll, 'gx--', label='Alternative FROC')
+        ins.semilogx(alternative_nll_high, alternative_ll, 'gx--', label='Alternative FROC')
+        
+        ax.fill_between(alternative_nll_high, alternative_ll_low, alternative_ll_high, alpha=.2)
+        ins.fill_between(alternative_nll_high, alternative_ll_low, alternative_ll_high, alpha=.2)
 
     if plot_title:
         box = ax.get_position()
@@ -189,6 +206,11 @@ def generate_froc_curve(
             ax.set_xlim([x_min, x_max])
         else:
             ax.set_ylim(bottom=0.05, top=1.02)
+        
+        if csv_path is not None:
+            min_x, max_x = min(alternative_nll_high), max(alternative_nll_high)
+            ax.set_xlim([min_x, max_x])
+            
         fig.tight_layout()
         fig.savefig(fname=plot_output_path, dpi=150)
     else:

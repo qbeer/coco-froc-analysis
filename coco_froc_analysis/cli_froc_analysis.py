@@ -69,6 +69,13 @@ def run():
         default=None,
         required=False,
     )
+    
+    parser.add_argument(
+        '--csv',
+        default=None,
+        required=False,
+        help='CSV file that contains alternative FROC data, for FROC curve generation ONLY',
+    )
 
     args = parser.parse_args()
 
@@ -111,6 +118,7 @@ def run():
             plot_output_path='froc_bootstrap.png' if args.plot_output_path is None else args.plot_output_path,
             test_ann=args.test_ann,
             bounds=args.bounds,
+            csv_path=args.csv,
         )
     else:
         print('Generating single FROC curve...')
@@ -124,4 +132,5 @@ def run():
             plot_output_path='froc.png' if args.plot_output_path is None else args.plot_output_path,
             test_ann=args.test_ann,
             bounds=args.bounds,
+            csv_path=args.csv,
         )
