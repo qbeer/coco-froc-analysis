@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import random
 from copy import deepcopy
 
@@ -9,11 +8,101 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
 
+from ..utils import build_gt_id2annotations
+from ..utils import build_pr_id2annotations
 from ..utils import transform_gt_into_pr
+from ..utils import update_scores
 from .froc_curve import calc_scores
 from .froc_curve import COLORS
 from .froc_curve import froc_point
-from .froc_curve import generate_froc_curve
+from .froc_stats import init_stats
+from .froc_stats import update_stats
+# from .froc_curve import generate_froc_curve
+
+
+# modified version to handle dicts instead of pathsof json files
+def froc_point_modified(gt_ann, pr_ann, score_thres, use_iou, iou_thres):
+
+    gt = gt_ann
+    pr = pr_ann
+
+    pr = update_scores(pr, score_thres)
+
+    categories = gt['categories']
+
+    stats = init_stats(gt, categories)
+
+    gt_id_to_annotation = build_gt_id2annotations(gt)
+    pr_id_to_annotation = build_pr_id2annotations(pr)
+
+    stats = update_stats(
+        stats,
+        gt_id_to_annotation,
+        pr_id_to_annotation,
+        categories,
+        use_iou,
+        iou_thres,
+    )
+
+    return stats
+
+
+# modified version to handle dicts instead of paths of json files
+def generate_froc_curve_from_dict(
+    gt_ann,
+    pr_ann,
+    use_iou=False,
+    iou_thres=0.5,
+    n_sample_points=50,
+    plot_title='FROC curve',
+    plot_output_path='froc.png',
+    test_ann=None,
+    bounds=None,
+):
+
+    lls_accuracy = {}
+    nlls_per_image = {}
+
+    for score_thres in np.linspace(0.0, 1.0, n_sample_points, endpoint=False):
+        stats = froc_point_modified(
+            gt_ann, pr_ann, score_thres, use_iou, iou_thres,
+        )
+        lls_accuracy, nlls_per_image = calc_scores(
+            stats,
+            lls_accuracy,
+            nlls_per_image,
+        )
+
+    return lls_accuracy, nlls_per_image
+
+
+# needed another modified version, so that the bootstrap version
+# wouldn't create unecessary plots.
+def generate_froc_curve(
+    gt_ann,
+    pr_ann,
+    use_iou=False,
+    iou_thres=0.5,
+    n_sample_points=50,
+    plot_title='FROC curve',
+    plot_output_path='froc.png',
+    test_ann=None,
+    bounds=None,
+):
+    lls_accuracy = {}
+    nlls_per_image = {}
+
+    for score_thres in tqdm(
+        np.linspace(0.0, 1.0, n_sample_points, endpoint=False),
+    ):
+        stats = froc_point(gt_ann, pr_ann, score_thres, use_iou, iou_thres)
+        lls_accuracy, nlls_per_image = calc_scores(
+            stats,
+            lls_accuracy,
+            nlls_per_image,
+        )
+
+    return lls_accuracy, nlls_per_image
 
 
 def generate_bootstrap_froc_curves(
@@ -39,12 +128,18 @@ def generate_bootstrap_froc_curves(
     fig, ax = plt.subplots(figsize=[27, 18])
     ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
     ins.set_xticks(
-        [0.1, 1.0, 2.0, 3.0, 4.0], [
-            0.1, 1.0, 2.0, 3.0, 4.0,
-        ], fontsize=45,
+        [0.1, 1.0, 2.0, 3.0, 4.0],
+        [
+            0.1,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+        ],
+        fontsize=45,
     )
 
-    ins.set_xlim([.1, 4.5])
+    ins.set_xlim([0.1, 4.5])
 
     collected_frocs = {'lls': {}, 'nlls': {}}
 
@@ -60,7 +155,8 @@ def generate_bootstrap_froc_curves(
 
     for _ in tqdm(range(n_bootstrap_samples)):
         selected_images = random.choices(
-            GT_ANN['images'], k=n_images,
+            GT_ANN['images'],
+            k=n_images,
         )  # sample with replacement
         bootstrap_gt = deepcopy(GT_ANN)
 
@@ -98,18 +194,9 @@ def generate_bootstrap_froc_curves(
 
         bootstrap_gt['images'] = re_indexed_images
 
-        with open('/tmp/tmp_bootstrap_gt.json', 'w') as fp:
-            json.dump(bootstrap_gt, fp)
-
-        with open('/tmp/tmp_bootstrap_pred.json', 'w') as fp:
-            json.dump(predictions, fp)
-
-        tmp_gt_ann = '/tmp/tmp_bootstrap_gt.json'
-        tmp_pred_ann = '/tmp/tmp_bootstrap_pred.json'
-
-        lls, nlls = generate_froc_curve(
-            tmp_gt_ann,
-            tmp_pred_ann,
+        lls, nlls = generate_froc_curve_from_dict(
+            bootstrap_gt,
+            predictions,
             use_iou,
             iou_thres,
             n_sample_points,
@@ -139,16 +226,20 @@ def generate_bootstrap_froc_curves(
         min_nlls, max_nlls = bounds[0], bounds[1]
 
     x_range = np.logspace(
-        np.log10(min_nlls + 1e-8), np.log10(max_nlls),
-        n_sample_points, endpoint=True,
+        np.log10(min_nlls + 1e-8),
+        np.log10(max_nlls),
+        n_sample_points,
+        endpoint=True,
     )
 
     for cat_id in collected_frocs['lls']:
         all_lls = np.array(collected_frocs['lls'][cat_id]).reshape(
-            n_bootstrap_samples, n_sample_points,
+            n_bootstrap_samples,
+            n_sample_points,
         )
         all_nlls = np.array(collected_frocs['nlls'][cat_id]).reshape(
-            n_bootstrap_samples, n_sample_points,
+            n_bootstrap_samples,
+            n_sample_points,
         )
 
         frocs = []
@@ -194,21 +285,21 @@ def generate_bootstrap_froc_curves(
             interpolated_frocs[cat_id]['nlls'],
             min_froc_lls[cat_id],
             max_froc_lls[cat_id],
-            alpha=.2,
+            alpha=0.2,
         )
 
         ins.fill_between(
             interpolated_frocs[cat_id]['nlls'],
             min_froc_lls[cat_id],
             max_froc_lls[cat_id],
-            alpha=.2,
+            alpha=0.2,
         )
 
         if test_ann is not None:
             for t_ann, c in zip(test_ann, COLORS):
                 t_ann, label = t_ann
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
-                stats = froc_point(gt_ann, t_pr, .5, use_iou, iou_thres)
+                stats = froc_point(gt_ann, t_pr, 0.5, use_iou, iou_thres)
                 _lls_accuracy, _nlls_per_image = calc_scores(stats, {}, {})
                 ax.plot(
                     _nlls_per_image[cat_id][0],
@@ -216,8 +307,8 @@ def generate_bootstrap_froc_curves(
                     'D',
                     markersize=15,
                     markeredgewidth=3,
-                    label=label +
-                    f' (FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
+                    label=label
+                    + f' (FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
                     c=c,
                 )
                 ins.plot(
@@ -226,8 +317,8 @@ def generate_bootstrap_froc_curves(
                     'D',
                     markersize=12,
                     markeredgewidth=2,
-                    label=label +
-                    f' (FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
+                    label=label
+                    + f' (FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
                     c=c,
                 )
                 ax.hlines(
@@ -251,7 +342,8 @@ def generate_bootstrap_froc_curves(
                         continue
                 else:
                     ax.text(
-                        x=_nlls_per_image[cat_id][0], y=_lls_accuracy[cat_id][0],
+                        x=_nlls_per_image[cat_id][0],
+                        y=_lls_accuracy[cat_id][0],
                         s=f' FP/image = {np.round(_nlls_per_image[cat_id][0], 2)}',
                         fontdict={'fontsize': 40, 'fontweight': 'bold'},
                     )
@@ -260,8 +352,12 @@ def generate_bootstrap_froc_curves(
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(
-        loc='lower left', bbox_to_anchor=(.1, .1),
-        fancybox=True, shadow=True, ncol=1, fontsize=45,
+        loc='lower left',
+        bbox_to_anchor=(0.1, 0.1),
+        fancybox=True,
+        shadow=True,
+        ncol=1,
+        fontsize=45,
     )
 
     ax.set_title(plot_title, fontdict={'fontsize': 45})
@@ -278,10 +374,7 @@ def generate_bootstrap_froc_curves(
     else:
         ax.set_ylim(bottom=0.05, top=1.02)
 
-    ax.grid(True, which='both', axis='both', alpha=.5, linestyle='--')
+    ax.grid(True, which='both', axis='both', alpha=0.5, linestyle='--')
 
     fig.tight_layout()
     fig.savefig(fname=plot_output_path, dpi=150)
-
-    os.remove('/tmp/tmp_bootstrap_gt.json')
-    os.remove('/tmp/tmp_bootstrap_pred.json')

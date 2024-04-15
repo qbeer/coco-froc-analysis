@@ -7,6 +7,22 @@ from ..utils import get_overlap
 
 
 def init_stats(gt: dict, categories: dict) -> dict:
+    """
+    Initializes statistics for each category based on ground truth annotations.
+
+    Parameters:
+    - gt (dict): Ground truth annotations containing information about categories.
+    - categories (dict): Dictionary containing category information.
+
+    Returns:
+    - stats (dict): Dictionary containing initialized statistics for each category.
+
+    This function initializes statistics for each category based on the provided
+    ground truth annotations and categories information. It creates a dictionary
+    with keys as category IDs and values as dictionaries containing the category name
+    along with initialized counts for true positives (TP), false positives (FP),
+    false negatives (FN), and total predictions (P).
+    """
     stats = {
         cat['id']: {
             'name': cat['name'],
@@ -25,6 +41,29 @@ def update_stats(
     stats: dict, gt_id_to_annotation: dict,
     pr_id_to_annotation: dict, categories: dict, weighted: bool,
 ):
+    """
+    Updates statistics based on ground truth and predicted annotations.
+
+    Parameters:
+    - stats (dict): Current statistics for each category.
+    - gt_id_to_annotation (dict): Mapping of image IDs to ground truth annotations.
+    - pr_id_to_annotation (dict): Mapping of image IDs to predicted annotations.
+    - categories (dict): Dictionary containing category information.
+    - weighted (bool): Flag indicating whether to use weighted matching.
+
+    Returns:
+    - stats (dict): Updated statistics for each category.
+
+    This function updates statistics for each category based on the provided
+    ground truth and predicted annotations. It creates a cost matrix between
+    ground truth annotations and predicted annotations based on overlap area
+    if `weighted` is True, or Euclidean distance if False. It then applies
+    the Hungarian algorithm to find the optimal assignment of annotations,
+    minimizing the total cost. The computed true positives (TP), false positives
+    (FP), and false negatives (FN) are updated accordingly in the `stats`
+    dictionary and returned.
+    """
+
     for image_id in gt_id_to_annotation:
         cat2anns: dict[int, dict[str, list]] = {}
         for cat in categories:

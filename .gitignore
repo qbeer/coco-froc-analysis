@@ -3,6 +3,7 @@ coco-froc
 coco
 dist/*
 .publish.sh
+bin/
 
 data/*.json
 

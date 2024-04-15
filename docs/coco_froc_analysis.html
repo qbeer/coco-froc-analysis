@@ -89,10 +89,7 @@ coco_froc_analysis    </h1>
 <span class="w">  </span><span class="nt">&quot;category_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.9990422129631042</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;bbox&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="mf">110.72555541992188</span><span class="p">,</span>
-<span class="w">    </span><span class="mf">13.9161834716797</span><span class="p">,</span>
-<span class="w">    </span><span class="mf">49.4566650390625</span><span class="p">,</span>
-<span class="w">    </span><span class="mf">36.65155029296875</span>
+<span class="w">    </span><span class="mf">110.72555541992188</span><span class="p">,</span><span class="w"> </span><span class="mf">13.9161834716797</span><span class="p">,</span><span class="w"> </span><span class="mf">49.4566650390625</span><span class="p">,</span><span class="w"> </span><span class="mf">36.65155029296875</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre>
@@ -243,13 +240,10 @@ python<span class="w"> </span>-m<span class="w"> </span>coverage<span class="w">
 
 <p>This will always fail at the last step because the repository needs the <code>CODECOV_TOKEN</code> to be set in the repository secrets. This is not present locally, but this is not an ERROR.</p>
 
-<h3 id="building-and-publishing-reminder">Building and publishing (reminder)</h3>
+<h3 id="creating-documentation">Creating documentation</h3>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code>act<span class="w"> </span><span class="c1"># for local CI pipeline</span>
-pdoc<span class="w"> </span>-d<span class="w"> </span>google<span class="w"> </span>coco_froc_analysis<span class="w"> </span>-o<span class="w"> </span>docs<span class="w"> </span><span class="c1"># build docs</span>
-poetry<span class="w"> </span>version<span class="w"> </span>prerelease/patch<span class="w"> </span><span class="c1"># test or actual release</span>
-poetry<span class="w"> </span>publish<span class="w"> </span>--build<span class="w"> </span>-r<span class="w"> </span>test-pypi<span class="w"> </span><span class="c1"># or without -r test-pypi for publishing to pypi</span>
+<pre><span></span><code>pdoc<span class="w"> </span>-d<span class="w"> </span>google<span class="w"> </span>coco_froc_analysis<span class="w"> </span>-o<span class="w"> </span>docs<span class="w"> </span><span class="c1"># build docs</span>
 </code></pre>
 </div>
 
