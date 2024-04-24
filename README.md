@@ -183,7 +183,7 @@ pdoc -d google coco_froc_analysis -o docs # build docs
 
 ```
 @misc{qbeer,
-  author       = {Alex Olar},
+  author       = {Alex Olar, Botond Koroknai},
   title        = {FROC analysis for COCO-like file format},
   howpublished = {GitHub repository},
   month        = {September},
