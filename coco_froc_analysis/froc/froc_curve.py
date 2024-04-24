@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
@@ -7,37 +9,22 @@ from tqdm.auto import tqdm
 from ..utils import build_gt_id2annotations
 from ..utils import build_pr_id2annotations
 from ..utils import COLORS
-from ..utils import load_json_from_file
 from ..utils import transform_gt_into_pr
 from ..utils import update_scores
 from .froc_stats import init_stats
 from .froc_stats import update_stats
 
 
-def froc_point(gt_ann, pr_ann, score_thres, use_iou, iou_thres):
-    """
-    Computes the FROC statistics
-    based on ground truth annotations and predicted annotations.
+def froc_point(gt, pr, score_thres, use_iou, iou_thres):
+    # TODO: add docstring
 
-    Parameters:
-    - gt_ann (str): Path to the ground truth annotations file in JSON format.
-    - pr_ann (str): Path to the predicted annotations file in JSON format.
-    - score_thres (float): Score threshold for predicted annotations.
-    - use_iou (bool): Flag indicating whether to use Intersection over Union (IoU) for matching annotations.
-    - iou_thres (float): IoU threshold for matching annotations if `use_iou` is True.
+    if type(pr) == str:
+        with open(pr) as fp:
+            pr = json.load(fp)
 
-    Returns:
-    - stats (dict): Dictionary containing FROC statistics for each category.
-
-    This function loads ground truth and predicted annotations from JSON files,
-    updates the predicted scores based on the given score threshold, initializes
-    statistics, builds dictionaries mapping annotation IDs to annotations,
-    updates statistics based on matched annotations, and returns the computed
-    statistics.
-    """
-
-    gt = load_json_from_file(gt_ann)
-    pr = load_json_from_file(pr_ann)
+    if type(gt) == str:
+        with open(gt) as fp:
+            gt = json.load(fp)
 
     pr = update_scores(pr, score_thres)
 
@@ -151,6 +138,14 @@ def generate_froc_curve(
 
     fig, ax = plt.subplots(figsize=[27, 18])
 
+    if type(gt_ann) != dict:
+        with open(gt_ann) as fp:
+            gt_ann = json.load(fp)
+
+    if type(pr_ann) != dict:
+        with open(pr_ann) as fp:
+            pr_ann = json.load(fp)
+
     if plot_title:
         ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
         ins.set_xticks(
@@ -179,78 +174,9 @@ def generate_froc_curve(
         lls = lls_accuracy[category_id]
         nlls = nlls_per_image[category_id]
 
-        if plot_title and np.all(np.array(nlls) > 0):
-            ax.semilogx(
-                nlls,
-                lls,
-                'D--',
-                label='AI ' + stats[category_id]['name'],
-                linewidth=4,
-                markersize=25,
-            )
-            if ins:
-                ins.plot(
-                    nlls,
-                    lls,
-                    'D--',
-                    label='AI ' + stats[category_id]['name'],
-                    linewidth=4,
-                    markersize=25,
-                )
-
-            if test_ann is not None:
-                for t_ann, c in zip(test_ann, COLORS):
-                    t_ann, label = t_ann
-                    t_pr = transform_gt_into_pr(t_ann, gt_ann)
-                    stats = froc_point(gt_ann, t_pr, 0.5, use_iou, iou_thres)
-                    _lls_accuracy, _nlls_per_image = calc_scores(stats, {}, {})
-                    if plot_title:
-                        ax.plot(
-                            _nlls_per_image[category_id][0],
-                            _lls_accuracy[category_id][0],
-                            'D',
-                            markersize=15,
-                            markeredgewidth=3,
-                            label=label
-                            + f' (FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
-                            c=c,
-                        )
-                        if ins:
-                            ins.plot(
-                                _nlls_per_image[category_id][0],
-                                _lls_accuracy[category_id][0],
-                                'D',
-                                markersize=12,
-                                markeredgewidth=2,
-                                label=label
-                                + f' (FP/image = {np.round(_nlls_per_image[category_id][0], 2)})',
-                                c=c,
-                            )
-
-                        ax.hlines(
-                            y=_lls_accuracy[category_id][0],
-                            xmin=np.min(nlls),
-                            xmax=np.max(nlls),
-                            linestyles='dashed',
-                            colors=c,
-                        )
-                        if ins:
-                            ins.hlines(
-                                y=_lls_accuracy[category_id][0],
-                                xmin=np.min(nlls),
-                                xmax=np.max(nlls),
-                                linestyles='dashed',
-                                colors=c,
-                            )
-                        ax.text(
-                            x=_nlls_per_image[category_id][0],
-                            y=_lls_accuracy[category_id][0],
-                            s=f' FP/image = {np.round(_nlls_per_image[category_id][0], 2)}',
-                            fontdict={'fontsize': 20, 'fontweight': 'bold'},
-                        )
-
-        elif plot_title:
-            ax.plot(
+        if plot_title:
+            plot_func = ax.semilogx if np.all(np.array(nlls) > 0) else ax.plot
+            plot_func(
                 nlls,
                 lls,
                 'D--',

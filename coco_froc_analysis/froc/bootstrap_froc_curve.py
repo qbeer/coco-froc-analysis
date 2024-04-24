@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import multiprocessing as mp
 import random
 from copy import deepcopy
 
@@ -8,101 +9,66 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import tqdm
 
-from ..utils import build_gt_id2annotations
-from ..utils import build_pr_id2annotations
 from ..utils import transform_gt_into_pr
-from ..utils import update_scores
 from .froc_curve import calc_scores
 from .froc_curve import COLORS
 from .froc_curve import froc_point
-from .froc_stats import init_stats
-from .froc_stats import update_stats
-# from .froc_curve import generate_froc_curve
+from .froc_curve import generate_froc_curve
 
 
-# modified version to handle dicts instead of pathsof json files
-def froc_point_modified(gt_ann, pr_ann, score_thres, use_iou, iou_thres):
+def run_bootstrap(args):
+    GT_ANN, PRED_ANN, n_images, n_sample_points, use_iou, iou_thres = args
+    selected_images = random.choices(
+        GT_ANN['images'],
+        k=n_images,
+    )
+    bootstrap_gt = deepcopy(GT_ANN)
 
-    gt = gt_ann
-    pr = pr_ann
+    del bootstrap_gt['images']
 
-    pr = update_scores(pr, score_thres)
+    bootstrap_gt['images'] = selected_images
 
-    categories = gt['categories']
+    gt_annotations = bootstrap_gt['annotations']
 
-    stats = init_stats(gt, categories)
+    del bootstrap_gt['annotations']
 
-    gt_id_to_annotation = build_gt_id2annotations(gt)
-    pr_id_to_annotation = build_pr_id2annotations(pr)
+    bootstrap_gt['annotations'] = []
+    for _gt_ann_ in gt_annotations:
+        img_id = _gt_ann_['image_id']
+        for ind, selected_image in enumerate(selected_images):
+            if selected_image['id'] == img_id:
+                new_gt_ann = deepcopy(_gt_ann_)
+                new_gt_ann['image_id'] = ind
+                bootstrap_gt['annotations'].append(new_gt_ann)
 
-    stats = update_stats(
-        stats,
-        gt_id_to_annotation,
-        pr_id_to_annotation,
-        categories,
+    predictions = []
+
+    for ind, img in enumerate(selected_images):
+        for pr in PRED_ANN:
+            if pr['image_id'] == img['id']:
+                new_pr = deepcopy(pr)
+                new_pr['image_id'] = ind
+                predictions.append(new_pr)
+
+    re_indexed_images = []
+    for ind in range(len(selected_images)):
+        image = deepcopy(selected_images[ind])
+        image['id'] = ind
+        re_indexed_images.append(image)
+
+    bootstrap_gt['images'] = re_indexed_images
+
+    lls, nlls = generate_froc_curve(
+        bootstrap_gt,
+        predictions,
         use_iou,
         iou_thres,
+        n_sample_points,
+        plot_title=None,
+        plot_output_path=None,
     )
 
-    return stats
-
-
-# modified version to handle dicts instead of paths of json files
-def generate_froc_curve_from_dict(
-    gt_ann,
-    pr_ann,
-    use_iou=False,
-    iou_thres=0.5,
-    n_sample_points=50,
-    plot_title='FROC curve',
-    plot_output_path='froc.png',
-    test_ann=None,
-    bounds=None,
-):
-
-    lls_accuracy = {}
-    nlls_per_image = {}
-
-    for score_thres in np.linspace(0.0, 1.0, n_sample_points, endpoint=False):
-        stats = froc_point_modified(
-            gt_ann, pr_ann, score_thres, use_iou, iou_thres,
-        )
-        lls_accuracy, nlls_per_image = calc_scores(
-            stats,
-            lls_accuracy,
-            nlls_per_image,
-        )
-
-    return lls_accuracy, nlls_per_image
-
-
-# needed another modified version, so that the bootstrap version
-# wouldn't create unecessary plots.
-def generate_froc_curve(
-    gt_ann,
-    pr_ann,
-    use_iou=False,
-    iou_thres=0.5,
-    n_sample_points=50,
-    plot_title='FROC curve',
-    plot_output_path='froc.png',
-    test_ann=None,
-    bounds=None,
-):
-    lls_accuracy = {}
-    nlls_per_image = {}
-
-    for score_thres in tqdm(
-        np.linspace(0.0, 1.0, n_sample_points, endpoint=False),
-    ):
-        stats = froc_point(gt_ann, pr_ann, score_thres, use_iou, iou_thres)
-        lls_accuracy, nlls_per_image = calc_scores(
-            stats,
-            lls_accuracy,
-            nlls_per_image,
-        )
-
-    return lls_accuracy, nlls_per_image
+    return lls, nlls
 
 
 def generate_bootstrap_froc_curves(
@@ -141,9 +107,7 @@ def generate_bootstrap_froc_curves(
 
     ins.set_xlim([0.1, 4.5])
 
-    collected_frocs = {'lls': {}, 'nlls': {}}
-
-    non_bootstrap_lls, non_bootstrap_nlls = generate_froc_curve(
+    _, non_bootstrap_nlls = generate_froc_curve(
         gt_ann,
         pr_ann,
         use_iou,
@@ -153,66 +117,28 @@ def generate_bootstrap_froc_curves(
         plot_output_path=None,
     )
 
-    for _ in tqdm(range(n_bootstrap_samples)):
-        selected_images = random.choices(
-            GT_ANN['images'],
-            k=n_images,
-        )  # sample with replacement
-        bootstrap_gt = deepcopy(GT_ANN)
+    collected_frocs = {'lls': {}, 'nlls': {}}
 
-        del bootstrap_gt['images']
+    with mp.Pool(mp.cpu_count() // 4 + 1) as pool:
+        args_list = [(
+            GT_ANN, PRED_ANN, n_images, n_sample_points,
+            use_iou, iou_thres,
+        ) for _ in range(n_bootstrap_samples)]
+        for outputs in tqdm(
+            pool.imap(run_bootstrap, args_list),
+            total=n_bootstrap_samples,
+            desc='Evaluating bootstrap samples...',
+        ):
+            lls, nlls = outputs
+            for cat_id in lls:
+                if collected_frocs['lls'].get(cat_id, None) is None:
+                    collected_frocs['lls'] = {cat_id: []}
+                if collected_frocs['nlls'].get(cat_id, None) is None:
+                    collected_frocs['nlls'] = {cat_id: []}
 
-        bootstrap_gt['images'] = selected_images
-
-        gt_annotations = bootstrap_gt['annotations']
-
-        del bootstrap_gt['annotations']
-
-        bootstrap_gt['annotations'] = []
-        for _gt_ann_ in gt_annotations:
-            img_id = _gt_ann_['image_id']
-            for ind, selected_image in enumerate(selected_images):
-                if selected_image['id'] == img_id:
-                    new_gt_ann = deepcopy(_gt_ann_)
-                    new_gt_ann['image_id'] = ind
-                    bootstrap_gt['annotations'].append(new_gt_ann)
-
-        predictions = []
-
-        for ind, img in enumerate(selected_images):
-            for pr in PRED_ANN:
-                if pr['image_id'] == img['id']:
-                    new_pr = deepcopy(pr)
-                    new_pr['image_id'] = ind
-                    predictions.append(new_pr)
-
-        re_indexed_images = []
-        for ind in range(len(selected_images)):
-            image = deepcopy(selected_images[ind])
-            image['id'] = ind
-            re_indexed_images.append(image)
-
-        bootstrap_gt['images'] = re_indexed_images
-
-        lls, nlls = generate_froc_curve_from_dict(
-            bootstrap_gt,
-            predictions,
-            use_iou,
-            iou_thres,
-            n_sample_points,
-            plot_title=None,
-            plot_output_path=None,
-        )
-
-        for cat_id in lls:
-            if collected_frocs['lls'].get(cat_id, None) is None:
-                collected_frocs['lls'] = {cat_id: []}
-            if collected_frocs['nlls'].get(cat_id, None) is None:
-                collected_frocs['nlls'] = {cat_id: []}
-
-        for cat_id in lls:
-            collected_frocs['lls'][cat_id].append(lls[cat_id])
-            collected_frocs['nlls'][cat_id].append(nlls[cat_id])
+            for cat_id in lls:
+                collected_frocs['lls'][cat_id].append(lls[cat_id])
+                collected_frocs['nlls'][cat_id].append(nlls[cat_id])
 
     interpolated_frocs = {}
     max_froc_lls = {}
