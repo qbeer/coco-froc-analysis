@@ -138,14 +138,6 @@ def generate_froc_curve(
 
     fig, ax = plt.subplots(figsize=[27, 18])
 
-    if type(gt_ann) != dict:
-        with open(gt_ann) as fp:
-            gt_ann = json.load(fp)
-
-    if type(pr_ann) != dict:
-        with open(pr_ann) as fp:
-            pr_ann = json.load(fp)
-
     if plot_title:
         ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
         ins.set_xticks(
