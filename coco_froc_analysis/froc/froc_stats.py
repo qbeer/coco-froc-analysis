@@ -92,14 +92,22 @@ def update_stats(
                 for gt_ind, gt_ann in enumerate(gt_anns):
                     for pr_ind, pr_ann in enumerate(pr_anns):
                         if use_iou:
+                            if iou_thres >= 1.0:
+                                raise ValueError(
+                                    'Invalid IoU threshold value. Threshold must be less than 1.0.',
+                                )
+
                             iou_score = get_iou_score(
                                 gt_ann['bbox'],
                                 pr_ann['bbox'],
                             )
+
                             if iou_score > iou_thres:
-                                cost_matrix[gt_ind, pr_ind] = iou_score / (
-                                    np.random.uniform(0, 1) / 1e6
-                                )
+                                cost_matrix[gt_ind, pr_ind] = (
+                                    1 - iou_score + 0.1 *
+                                    np.random.uniform(0, 1)
+                                ) * 1e6
+
                         else:
                             gt_x, gt_y, gt_w, gt_h = gt_ann['bbox']
 

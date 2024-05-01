@@ -33,10 +33,7 @@ While the prediction (here for bounding box) given by the region detection frame
   "category_id": 3,
   "score": 0.9990422129631042,
   "bbox": [
-    110.72555541992188,
-    13.9161834716797,
-    49.4566650390625,
-    36.65155029296875
+    110.72555541992188, 13.9161834716797, 49.4566650390625, 36.65155029296875
   ]
 }
 ```
@@ -186,7 +183,7 @@ pdoc -d google coco_froc_analysis -o docs # build docs
 
 ```
 @misc{qbeer,
-  author       = {Alex Olar},
+  author       = {Alex Olar, Botond Koroknai},
   title        = {FROC analysis for COCO-like file format},
   howpublished = {GitHub repository},
   month        = {September},

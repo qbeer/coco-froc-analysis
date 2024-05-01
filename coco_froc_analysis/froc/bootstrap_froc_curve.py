@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import os
+import multiprocessing as mp
 import random
 from copy import deepcopy
 
@@ -16,6 +16,86 @@ from .froc_curve import froc_point
 from .froc_curve import generate_froc_curve
 
 
+def run_bootstrap(args):
+    """
+    Runs a single iteration of bootstrapping to generate ground truth annotations and predictions
+    for calculating Free-Response Receiver Operating Characteristic (FROC) curve.
+
+    Parameters:
+    - args (Tuple[str, str, int, int, bool, float]): A tuple containing:
+        - gt_ann (str): Path to the ground truth annotations file in JSON format.
+        - pr_ann (str): Path to the predicted annotations file in JSON format.
+        - n_images (int): Number of images to select for bootstrapping.
+        - n_sample_points (int): Number of sample points to generate on the FROC curve.
+        - use_iou (bool): Flag indicating whether to use Intersection over Union (IoU) for
+          matching annotations.
+        - iou_thres (float): IoU threshold for matching annotations if `use_iou` is True.
+
+    Returns:
+    - Tuple[Dict[str, List[float]], Dict[str, List[float]]]: A tuple containing dictionaries of
+      sensitivity (lls) and false positive rate per image (nlls) for the generated FROC curve.
+
+    The function creates ground truth annotations and predictions based on bootstrapping,
+    for the purpose of evaluating the Free-Response Receiver Operating Characteristic (FROC) curve.
+    It takes the provided paths to ground truth annotations (`gt_ann`) and predicted annotations (`pr_ann`),
+    selects a subset of images for bootstrapping, and re-indexes annotations accordingly.
+    After preparing the data, it calculates sensitivity and false positive rate per image
+    using the `generate_froc_curve` function and returns them as dictionaries.
+    """
+    GT_ANN, PRED_ANN, n_images, n_sample_points, use_iou, iou_thres = args
+    selected_images = random.choices(
+        GT_ANN['images'],
+        k=n_images,
+    )
+    bootstrap_gt = deepcopy(GT_ANN)
+
+    del bootstrap_gt['images']
+
+    bootstrap_gt['images'] = selected_images
+
+    gt_annotations = bootstrap_gt['annotations']
+
+    del bootstrap_gt['annotations']
+
+    bootstrap_gt['annotations'] = []
+    for _gt_ann_ in gt_annotations:
+        img_id = _gt_ann_['image_id']
+        for ind, selected_image in enumerate(selected_images):
+            if selected_image['id'] == img_id:
+                new_gt_ann = deepcopy(_gt_ann_)
+                new_gt_ann['image_id'] = ind
+                bootstrap_gt['annotations'].append(new_gt_ann)
+
+    predictions = []
+
+    for ind, img in enumerate(selected_images):
+        for pr in PRED_ANN:
+            if pr['image_id'] == img['id']:
+                new_pr = deepcopy(pr)
+                new_pr['image_id'] = ind
+                predictions.append(new_pr)
+
+    re_indexed_images = []
+    for ind in range(len(selected_images)):
+        image = deepcopy(selected_images[ind])
+        image['id'] = ind
+        re_indexed_images.append(image)
+
+    bootstrap_gt['images'] = re_indexed_images
+
+    lls, nlls = generate_froc_curve(
+        bootstrap_gt,
+        predictions,
+        use_iou,
+        iou_thres,
+        n_sample_points,
+        plot_title=None,
+        plot_output_path=None,
+    )
+
+    return lls, nlls
+
+
 def generate_bootstrap_froc_curves(
     gt_ann,
     pr_ann,
@@ -28,6 +108,37 @@ def generate_bootstrap_froc_curves(
     test_ann=None,
     bounds=None,
 ):
+    """
+    Generate bootstrap Free-Response Receiver Operating Characteristic (FROC) curves based on
+    ground truth and predicted annotations.
+
+    Parameters:
+    - gt_ann (str): Path to the ground truth annotations file in JSON format.
+    - pr_ann (str): Path to the predicted annotations file in JSON format.
+    - n_bootstrap_samples (int): Number of bootstrap samples. Default value is 5.
+    - use_iou (bool): Flag indicating whether to use Intersection over Union (IoU) for
+      matching annotations. Default value is False.
+    - iou_thres (float): IoU threshold for matching annotations if `use_iou` is True.
+      Default value is 0.5.
+    - n_sample_points (int): Number of sample points to generate on the FROC curve.
+      Default value is 50.
+    - plot_title (str): Title for the generated FROC curve plot. Default title is "Bootstrap FROC".
+    - plot_output_path (str): Path to save the generated FROC curve plot. Default path is
+      "froc_bootstrapped.png".
+    - test_ann (List[Tuple[Any, str]]): List of tuples containing additional annotations for
+      testing, where each tuple contains annotation data and a label. Default value is None.
+    - bounds (Tuple[float, float, float, float]): Tuple containing the minimum and maximum bounds
+      for the x and y axes of the plot, respectively. Default value is None.
+
+    Returns:
+    - None
+
+    The function generates bootstrapped FROC curves based on ground truth annotations (`gt_ann`) and
+    predicted annotations (`pr_ann`). It evaluates the FROC curves for a specified number of bootstrap
+    samples, considering parameters such as IoU threshold and sample points. Additional annotations
+    for testing can be provided, and bounds for the plot axes can be set. The resulting plot is saved
+    at the specified `plot_output_path`.
+    """
     with open(gt_ann) as fp:
         GT_ANN = json.load(fp)
 
@@ -39,16 +150,20 @@ def generate_bootstrap_froc_curves(
     fig, ax = plt.subplots(figsize=[27, 18])
     ins = ax.inset_axes([0.55, 0.05, 0.45, 0.4])
     ins.set_xticks(
-        [0.1, 1.0, 2.0, 3.0, 4.0], [
-            0.1, 1.0, 2.0, 3.0, 4.0,
-        ], fontsize=45,
+        [0.1, 1.0, 2.0, 3.0, 4.0],
+        [
+            0.1,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+        ],
+        fontsize=45,
     )
 
-    ins.set_xlim([.1, 4.5])
+    ins.set_xlim([0.1, 4.5])
 
-    collected_frocs = {'lls': {}, 'nlls': {}}
-
-    non_bootstrap_lls, non_bootstrap_nlls = generate_froc_curve(
+    _, non_bootstrap_nlls = generate_froc_curve(
         gt_ann,
         pr_ann,
         use_iou,
@@ -58,74 +173,35 @@ def generate_bootstrap_froc_curves(
         plot_output_path=None,
     )
 
-    for _ in tqdm(range(n_bootstrap_samples)):
-        selected_images = random.choices(
-            GT_ANN['images'], k=n_images,
-        )  # sample with replacement
-        bootstrap_gt = deepcopy(GT_ANN)
+    collected_frocs = {'lls': {}, 'nlls': {}}
 
-        del bootstrap_gt['images']
+    with mp.Pool(mp.cpu_count() // 4 + 1) as pool:
+        args_list = [
+            (
+                GT_ANN,
+                PRED_ANN,
+                n_images,
+                n_sample_points,
+                use_iou,
+                iou_thres,
+            )
+            for _ in range(n_bootstrap_samples)
+        ]
+        for outputs in tqdm(
+            pool.imap(run_bootstrap, args_list),
+            total=n_bootstrap_samples,
+            desc='Evaluating bootstrap samples...',
+        ):
+            lls, nlls = outputs
+            for cat_id in lls:
+                if collected_frocs['lls'].get(cat_id, None) is None:
+                    collected_frocs['lls'] = {cat_id: []}
+                if collected_frocs['nlls'].get(cat_id, None) is None:
+                    collected_frocs['nlls'] = {cat_id: []}
 
-        bootstrap_gt['images'] = selected_images
-
-        gt_annotations = bootstrap_gt['annotations']
-
-        del bootstrap_gt['annotations']
-
-        bootstrap_gt['annotations'] = []
-        for _gt_ann_ in gt_annotations:
-            img_id = _gt_ann_['image_id']
-            for ind, selected_image in enumerate(selected_images):
-                if selected_image['id'] == img_id:
-                    new_gt_ann = deepcopy(_gt_ann_)
-                    new_gt_ann['image_id'] = ind
-                    bootstrap_gt['annotations'].append(new_gt_ann)
-
-        predictions = []
-
-        for ind, img in enumerate(selected_images):
-            for pr in PRED_ANN:
-                if pr['image_id'] == img['id']:
-                    new_pr = deepcopy(pr)
-                    new_pr['image_id'] = ind
-                    predictions.append(new_pr)
-
-        re_indexed_images = []
-        for ind in range(len(selected_images)):
-            image = deepcopy(selected_images[ind])
-            image['id'] = ind
-            re_indexed_images.append(image)
-
-        bootstrap_gt['images'] = re_indexed_images
-
-        with open('/tmp/tmp_bootstrap_gt.json', 'w') as fp:
-            json.dump(bootstrap_gt, fp)
-
-        with open('/tmp/tmp_bootstrap_pred.json', 'w') as fp:
-            json.dump(predictions, fp)
-
-        tmp_gt_ann = '/tmp/tmp_bootstrap_gt.json'
-        tmp_pred_ann = '/tmp/tmp_bootstrap_pred.json'
-
-        lls, nlls = generate_froc_curve(
-            tmp_gt_ann,
-            tmp_pred_ann,
-            use_iou,
-            iou_thres,
-            n_sample_points,
-            plot_title=None,
-            plot_output_path=None,
-        )
-
-        for cat_id in lls:
-            if collected_frocs['lls'].get(cat_id, None) is None:
-                collected_frocs['lls'] = {cat_id: []}
-            if collected_frocs['nlls'].get(cat_id, None) is None:
-                collected_frocs['nlls'] = {cat_id: []}
-
-        for cat_id in lls:
-            collected_frocs['lls'][cat_id].append(lls[cat_id])
-            collected_frocs['nlls'][cat_id].append(nlls[cat_id])
+            for cat_id in lls:
+                collected_frocs['lls'][cat_id].append(lls[cat_id])
+                collected_frocs['nlls'][cat_id].append(nlls[cat_id])
 
     interpolated_frocs = {}
     max_froc_lls = {}
@@ -139,16 +215,20 @@ def generate_bootstrap_froc_curves(
         min_nlls, max_nlls = bounds[0], bounds[1]
 
     x_range = np.logspace(
-        np.log10(min_nlls + 1e-8), np.log10(max_nlls),
-        n_sample_points, endpoint=True,
+        np.log10(min_nlls + 1e-8),
+        np.log10(max_nlls),
+        n_sample_points,
+        endpoint=True,
     )
 
     for cat_id in collected_frocs['lls']:
         all_lls = np.array(collected_frocs['lls'][cat_id]).reshape(
-            n_bootstrap_samples, n_sample_points,
+            n_bootstrap_samples,
+            n_sample_points,
         )
         all_nlls = np.array(collected_frocs['nlls'][cat_id]).reshape(
-            n_bootstrap_samples, n_sample_points,
+            n_bootstrap_samples,
+            n_sample_points,
         )
 
         frocs = []
@@ -194,21 +274,21 @@ def generate_bootstrap_froc_curves(
             interpolated_frocs[cat_id]['nlls'],
             min_froc_lls[cat_id],
             max_froc_lls[cat_id],
-            alpha=.2,
+            alpha=0.2,
         )
 
         ins.fill_between(
             interpolated_frocs[cat_id]['nlls'],
             min_froc_lls[cat_id],
             max_froc_lls[cat_id],
-            alpha=.2,
+            alpha=0.2,
         )
 
         if test_ann is not None:
             for t_ann, c in zip(test_ann, COLORS):
                 t_ann, label = t_ann
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
-                stats = froc_point(gt_ann, t_pr, .5, use_iou, iou_thres)
+                stats = froc_point(gt_ann, t_pr, 0.5, use_iou, iou_thres)
                 _lls_accuracy, _nlls_per_image = calc_scores(stats, {}, {})
                 ax.plot(
                     _nlls_per_image[cat_id][0],
@@ -216,8 +296,8 @@ def generate_bootstrap_froc_curves(
                     'D',
                     markersize=15,
                     markeredgewidth=3,
-                    label=label +
-                    f' (FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
+                    label=label
+                    + f' (FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
                     c=c,
                 )
                 ins.plot(
@@ -226,8 +306,8 @@ def generate_bootstrap_froc_curves(
                     'D',
                     markersize=12,
                     markeredgewidth=2,
-                    label=label +
-                    f' (FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
+                    label=label
+                    + f' (FP/image = {np.round(_nlls_per_image[cat_id][0], 2)})',
                     c=c,
                 )
                 ax.hlines(
@@ -251,7 +331,8 @@ def generate_bootstrap_froc_curves(
                         continue
                 else:
                     ax.text(
-                        x=_nlls_per_image[cat_id][0], y=_lls_accuracy[cat_id][0],
+                        x=_nlls_per_image[cat_id][0],
+                        y=_lls_accuracy[cat_id][0],
                         s=f' FP/image = {np.round(_nlls_per_image[cat_id][0], 2)}',
                         fontdict={'fontsize': 40, 'fontweight': 'bold'},
                     )
@@ -260,8 +341,12 @@ def generate_bootstrap_froc_curves(
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(
-        loc='lower left', bbox_to_anchor=(.1, .1),
-        fancybox=True, shadow=True, ncol=1, fontsize=45,
+        loc='lower left',
+        bbox_to_anchor=(0.1, 0.1),
+        fancybox=True,
+        shadow=True,
+        ncol=1,
+        fontsize=45,
     )
 
     ax.set_title(plot_title, fontdict={'fontsize': 45})
@@ -278,10 +363,7 @@ def generate_bootstrap_froc_curves(
     else:
         ax.set_ylim(bottom=0.05, top=1.02)
 
-    ax.grid(True, which='both', axis='both', alpha=.5, linestyle='--')
+    ax.grid(True, which='both', axis='both', alpha=0.5, linestyle='--')
 
     fig.tight_layout()
     fig.savefig(fname=plot_output_path, dpi=150)
-
-    os.remove('/tmp/tmp_bootstrap_gt.json')
-    os.remove('/tmp/tmp_bootstrap_pred.json')
