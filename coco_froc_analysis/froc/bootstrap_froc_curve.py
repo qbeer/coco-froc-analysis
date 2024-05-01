@@ -17,6 +17,31 @@ from .froc_curve import generate_froc_curve
 
 
 def run_bootstrap(args):
+    """
+    Runs a single iteration of bootstrapping to generate ground truth annotations and predictions
+    for calculating Free-Response Receiver Operating Characteristic (FROC) curve.
+
+    Parameters:
+    - args (Tuple[str, str, int, int, bool, float]): A tuple containing:
+        - gt_ann (str): Path to the ground truth annotations file in JSON format.
+        - pr_ann (str): Path to the predicted annotations file in JSON format.
+        - n_images (int): Number of images to select for bootstrapping.
+        - n_sample_points (int): Number of sample points to generate on the FROC curve.
+        - use_iou (bool): Flag indicating whether to use Intersection over Union (IoU) for
+          matching annotations.
+        - iou_thres (float): IoU threshold for matching annotations if `use_iou` is True.
+
+    Returns:
+    - Tuple[Dict[str, List[float]], Dict[str, List[float]]]: A tuple containing dictionaries of
+      sensitivity (lls) and false positive rate per image (nlls) for the generated FROC curve.
+
+    The function creates ground truth annotations and predictions based on bootstrapping,
+    for the purpose of evaluating the Free-Response Receiver Operating Characteristic (FROC) curve.
+    It takes the provided paths to ground truth annotations (`gt_ann`) and predicted annotations (`pr_ann`),
+    selects a subset of images for bootstrapping, and re-indexes annotations accordingly.
+    After preparing the data, it calculates sensitivity and false positive rate per image
+    using the `generate_froc_curve` function and returns them as dictionaries.
+    """
     GT_ANN, PRED_ANN, n_images, n_sample_points, use_iou, iou_thres = args
     selected_images = random.choices(
         GT_ANN['images'],
@@ -83,6 +108,37 @@ def generate_bootstrap_froc_curves(
     test_ann=None,
     bounds=None,
 ):
+    """
+    Generate bootstrap Free-Response Receiver Operating Characteristic (FROC) curves based on
+    ground truth and predicted annotations.
+
+    Parameters:
+    - gt_ann (str): Path to the ground truth annotations file in JSON format.
+    - pr_ann (str): Path to the predicted annotations file in JSON format.
+    - n_bootstrap_samples (int): Number of bootstrap samples. Default value is 5.
+    - use_iou (bool): Flag indicating whether to use Intersection over Union (IoU) for
+      matching annotations. Default value is False.
+    - iou_thres (float): IoU threshold for matching annotations if `use_iou` is True.
+      Default value is 0.5.
+    - n_sample_points (int): Number of sample points to generate on the FROC curve.
+      Default value is 50.
+    - plot_title (str): Title for the generated FROC curve plot. Default title is "Bootstrap FROC".
+    - plot_output_path (str): Path to save the generated FROC curve plot. Default path is
+      "froc_bootstrapped.png".
+    - test_ann (List[Tuple[Any, str]]): List of tuples containing additional annotations for
+      testing, where each tuple contains annotation data and a label. Default value is None.
+    - bounds (Tuple[float, float, float, float]): Tuple containing the minimum and maximum bounds
+      for the x and y axes of the plot, respectively. Default value is None.
+
+    Returns:
+    - None
+
+    The function generates bootstrapped FROC curves based on ground truth annotations (`gt_ann`) and
+    predicted annotations (`pr_ann`). It evaluates the FROC curves for a specified number of bootstrap
+    samples, considering parameters such as IoU threshold and sample points. Additional annotations
+    for testing can be provided, and bounds for the plot axes can be set. The resulting plot is saved
+    at the specified `plot_output_path`.
+    """
     with open(gt_ann) as fp:
         GT_ANN = json.load(fp)
 
@@ -120,10 +176,17 @@ def generate_bootstrap_froc_curves(
     collected_frocs = {'lls': {}, 'nlls': {}}
 
     with mp.Pool(mp.cpu_count() // 4 + 1) as pool:
-        args_list = [(
-            GT_ANN, PRED_ANN, n_images, n_sample_points,
-            use_iou, iou_thres,
-        ) for _ in range(n_bootstrap_samples)]
+        args_list = [
+            (
+                GT_ANN,
+                PRED_ANN,
+                n_images,
+                n_sample_points,
+                use_iou,
+                iou_thres,
+            )
+            for _ in range(n_bootstrap_samples)
+        ]
         for outputs in tqdm(
             pool.imap(run_bootstrap, args_list),
             total=n_bootstrap_samples,

@@ -16,7 +16,23 @@ from .froc_stats import update_stats
 
 
 def froc_point(gt, pr, score_thres, use_iou, iou_thres):
-    # TODO: add docstring
+    """
+    Calculate statistics for a single point on the FROC curve based on ground truth and predicted annotations.
+
+    Parameters:
+    - gt (str): Path to the ground truth annotations file in JSON format.
+    - pr (str): Path to the predicted annotations file in JSON format.
+    - score_thres (float): Score threshold for predictions.
+    - use_iou (bool): Flag indicating whether to use Intersection over Union (IoU) for matching annotations.
+    - iou_thres (float): IoU threshold for matching annotations if `use_iou` is True.
+
+    Returns:
+    - dict: Statistics including true positives (TP), false positives (FP), and false negatives (FN) for each category.
+
+    This function calculates the statistics for a single point on the FROC curve based on ground truth and predicted
+    annotations. It loads the annotations from JSON files, updates the scores based on the score threshold, initializes
+    FROC statistics, and then updates the statistics by comparing ground truth and predicted annotations.
+    """
 
     if type(pr) == str:
         with open(pr) as fp:
@@ -114,7 +130,7 @@ def generate_froc_curve(
     - iou_thres (float): IoU threshold for matching annotations if `use_iou` is True.
       Default value is 0.5.
     - n_sample_points (int): Number of sample points to generate on the FROC curve.
-      Defaults value 50.
+      Default value is 50.
     - plot_title (str): Title for the generated FROC curve plot. Default title is "FROC curve".
     - plot_output_path (str): Path to save the generated FROC curve plot. Default path is
       "froc.png".

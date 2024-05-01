@@ -27,6 +27,27 @@ def generate_bootstrap_count_curves(
     test_ann=None,
     bounds=None,
 ):
+    """
+    This function generates bootstrapped count curves, which are statistical estimates of precision-recall curves
+    obtained by resampling the data with replacement. It takes ground truth and predicted annotations as input and
+    performs bootstrapping to generate multiple count curves. The mean count curve and confidence intervals are
+    plotted based on the bootstrapped samples.
+
+    Args:
+        gt_ann (str): Path to the ground truth annotation JSON file.
+        pr_ann (str): Path to the predicted annotation JSON file.
+        weighted (bool, optional): Whether to use weighted counts. Default value is False.
+        n_sample_points (int, optional): Number of sample points for the count curves. Default value is 50.
+        n_bootstrap_samples (int, optional): Number of bootstrap samples. Default value is 5.
+        plot_title (str, optional): Title for the plot. Default title is 'Count curve'.
+        plot_output_path (str, optional): Output path for the plot. Default path is 'counts.png'.
+        test_ann (list, optional): List of test annotations for additional points on the plot.
+                                   Each entry is a tuple of annotations and label. Default value is None.
+        bounds (tuple, optional): Bounds for the plot in the format (x_min, x_max, y_min, y_max). Default value is None.
+
+    Returns:
+        None
+    """
     with open(gt_ann) as fp:
         GT_ANN = json.load(fp)
 
@@ -37,15 +58,15 @@ def generate_bootstrap_count_curves(
 
     fig, ax = plt.subplots(figsize=[27, 18])
     ins = ax.inset_axes([0.05, 0.05, 0.45, 0.4])
-    ins.set_xticks([.85, .9, .95], [.85, .9, .95], fontsize=40)
+    ins.set_xticks([0.85, 0.9, 0.95], [0.85, 0.9, 0.95], fontsize=40)
     ins.yaxis.tick_right()
     ins.xaxis.tick_top()
 
     if bounds is not None:
         _, x_max, _, _ = bounds
-        ins.set_xlim([.8, x_max])
+        ins.set_xlim([0.8, x_max])
     else:
-        ins.set_xlim([.8, 1.0])
+        ins.set_xlim([0.8, 1.0])
 
     collected_rocs = {'precision': {}, 'recall': {}}
 
@@ -130,10 +151,12 @@ def generate_bootstrap_count_curves(
 
     for cat_id in collected_rocs['precision']:
         all_prec = np.array(collected_rocs['precision'][cat_id]).reshape(
-            n_bootstrap_samples, n_sample_points,
+            n_bootstrap_samples,
+            n_sample_points,
         )
         all_rec = np.array(collected_rocs['recall'][cat_id]).reshape(
-            n_bootstrap_samples, n_sample_points,
+            n_bootstrap_samples,
+            n_sample_points,
         )
 
         min_rec, max_rec = np.min(non_bootstrap_rec[cat_id]), np.max(
@@ -198,21 +221,21 @@ def generate_bootstrap_count_curves(
             interpolated_rocs[cat_id]['rec'],
             min_roc_prec[cat_id],
             max_roc_prec[cat_id],
-            alpha=.2,
+            alpha=0.2,
         )
 
         ins.fill_between(
             interpolated_rocs[cat_id]['rec'],
             min_roc_prec[cat_id],
             max_roc_prec[cat_id],
-            alpha=.2,
+            alpha=0.2,
         )
 
         if test_ann is not None:
             for t_ann, c in zip(test_ann, COLORS):
                 t_ann, label = t_ann
                 t_pr = transform_gt_into_pr(t_ann, gt_ann)
-                stats = count_point(gt_ann, t_pr, .5, weighted)
+                stats = count_point(gt_ann, t_pr, 0.5, weighted)
                 _prec_accuracy, _rec_per_image = calc_scores(stats, {}, {})
                 ax.plot(
                     _rec_per_image[cat_id][0],
@@ -241,7 +264,8 @@ def generate_bootstrap_count_curves(
                         continue
                 else:
                     ax.text(
-                        x=_rec_per_image[cat_id][0], y=_prec_accuracy[cat_id][0],
+                        x=_rec_per_image[cat_id][0],
+                        y=_prec_accuracy[cat_id][0],
                         s=f' R = {np.round(_rec_per_image[cat_id][0], 3)}',
                         fontdict={'fontsize': 35, 'fontweight': 'bold'},
                     )
@@ -266,13 +290,18 @@ def generate_bootstrap_count_curves(
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     ax.legend(
-        loc='lower left', bbox_to_anchor=(.65, .1),
-        fancybox=True, shadow=True, ncol=1, fontsize=40,
+        loc='lower left',
+        bbox_to_anchor=(0.65, 0.1),
+        fancybox=True,
+        shadow=True,
+        ncol=1,
+        fontsize=40,
     )
 
     ax.set_title(plot_title, fontdict={'fontsize': 45})
     ax.set_ylabel(
-        'Precision', fontdict={
+        'Precision',
+        fontdict={
             'fontsize': 45,
         },
     )
@@ -285,10 +314,10 @@ def generate_bootstrap_count_curves(
         x_min, x_max, _, _ = bounds
         ax.set_xlim([x_min, x_max])
     else:
-        ax.set_xlim([.7, 1.0])
+        ax.set_xlim([0.7, 1.0])
         ax.set_ylim(bottom=0.05, top=1.02)
 
-    ax.grid(True, which='both', axis='both', alpha=.5, linestyle='--')
+    ax.grid(True, which='both', axis='both', alpha=0.5, linestyle='--')
     fig.tight_layout()
     fig.savefig(plot_output_path, dpi=150)
 
