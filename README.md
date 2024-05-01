@@ -183,11 +183,12 @@ pdoc -d google coco_froc_analysis -o docs # build docs
 
 ```
 @misc{qbeer,
-  author       = {Alex Olar, Botond Koroknai},
+  author       = {Olar, A., & Koroknai, B.},
   title        = {FROC analysis for COCO-like file format},
-  howpublished = {GitHub repository},
-  month        = {September},
-  year         = {2022},
-  url          = {https://github.com/qbeer/coco-froc-analysis}
+  howpublished = {COCO FROC analysis package (0.2.15). Zenodo. },
+  month        = {May},
+  year         = {2024},
+  url          = {https://github.com/qbeer/coco-froc-analysis},
+  doi          = {https://doi.org/10.5281/zenodo.11098382}
 }
 ```
