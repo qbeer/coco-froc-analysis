@@ -192,3 +192,16 @@ pdoc -d google coco_froc_analysis -o docs # build docs
   doi          = {https://doi.org/10.5281/zenodo.11098382}
 }
 ```
+
+```
+@article{olar2024annotated,
+  title={Annotated dataset for training deep learning models to detect astrocytes in human brain tissue},
+  author={Olar, Alex and Tyler, Teadora and Hoppa, Paulina and Frank, Erzs{\'e}bet and Csabai, Istv{\'a}n and Adorjan, Istvan and Pollner, P{\'e}ter},
+  journal={Scientific Data},
+  volume={11},
+  number={1},
+  pages={96},
+  year={2024},
+  publisher={Nature Publishing Group UK London}
+}
+```
